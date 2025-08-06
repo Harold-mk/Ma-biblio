@@ -19,7 +19,8 @@ public class Livre {
     private String titre;
     private String auteur;
     private String description;
-    private int nbreExemplaires;
+    private int nbreExemplairesInitial;
+    private int nbreExemplairesFinal;
     private String imageUrl;
     @ManyToOne(cascade = CascadeType.ALL)
     private Categorie categorie;
