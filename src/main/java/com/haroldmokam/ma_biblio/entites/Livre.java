@@ -20,7 +20,7 @@ public class Livre {
     private String auteur;
     private String description;
     private int nbreExemplairesInitial;
-    private int nbreExemplairesFinal;
+    private int nbreExemplairesRestant;
     private String imageUrl;
     @ManyToOne(cascade = CascadeType.ALL)
     private Categorie categorie;
