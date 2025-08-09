@@ -31,10 +31,11 @@ public class CategorieService {
 
     }
 
-    public void modifierCategorie(Categorie categorie) {
-        Optional<Categorie> categorieDansBD = categorieRepository.findByLibelle(categorie.getLibelle());
-        if(categorieDansBD.isPresent()) {
-            categorieRepository.save(categorie);
+    public void modifierCategorie(int id, Categorie categorie) {
+        Categorie categorieDansBD = categorieRepository.findById(id);
+        if(categorieDansBD != null) {
+            categorieDansBD.setLibelle(categorie.getLibelle());
+            categorieRepository.save(categorieDansBD);
         }
         else{
             throw new RuntimeException("L'element n'existe pas dans la base de donnees.");
@@ -63,9 +64,9 @@ public class CategorieService {
         return categorieRepository.findAll();
     }
 
-    public Optional<Categorie> rechercherCategorieParId(int id) {
-       Optional <Categorie> categorieDansBD = categorieRepository.findById(id);
-       if(categorieDansBD.isEmpty()) {
+    public Categorie rechercherCategorieParId(int id) {
+       Categorie categorieDansBD = categorieRepository.findById(id);
+       if(categorieDansBD == null) {
            throw new RuntimeException("Cette categorie n'existe pas ou a deja ete supprimee.");
        }
        return categorieDansBD;
