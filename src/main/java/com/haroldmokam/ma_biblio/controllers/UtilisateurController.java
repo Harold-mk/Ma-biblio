@@ -25,7 +25,7 @@ public class UtilisateurController {
     }
 
     @PutMapping(path = "/modifier/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> modifierUtilisateur(@PathVariable  int id ,@RequestBody Utilisateur utilisateur) {
+    public ResponseEntity<String> modifierUtilisateur(@RequestBody Utilisateur utilisateur) {
         utilisateurService.modifierUtilisateur(utilisateur);
         return new ResponseEntity<>(utilisateur.toString(), HttpStatus.ACCEPTED);
     }

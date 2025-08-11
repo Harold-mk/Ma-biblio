@@ -28,14 +28,14 @@ public class CategorieController {
          String ancienLibelle = categorieDansBD.getLibelle();
          categorieDansBD.setLibelle(categorie.getLibelle());
         categorieService.creerCategorie(categorieDansBD);
-        log.info("La categorie est quitte de %s a %s", ancienLibelle, categorieDansBD.getLibelle());
+        log.info("La categorie est quitte de "+ancienLibelle+" a %s"+ categorieDansBD.getLibelle());
     }
 
     @DeleteMapping(path = "/supprimer/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public void supprimerCategorie(@PathVariable int id) {
         Categorie categorieDansBD = categorieService.rechercherCategorieParId(id);
         categorieService.supprimerCategorie(categorieDansBD);
-        log.info("La categorie %s a ete supprimee de la base de donnees", categorieDansBD.getLibelle());
+        log.info("La categorie "+categorieDansBD.getLibelle()+" a ete supprimee de la base de donnees");
     }
 
     @GetMapping(path = "/liste")

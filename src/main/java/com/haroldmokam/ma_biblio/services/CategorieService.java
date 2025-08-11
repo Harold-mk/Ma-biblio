@@ -31,11 +31,6 @@ public class CategorieService {
 
     }
 
-    public void modifierCategorie(int id, Categorie categorie) {
-        Categorie categorieDansBD = categorieRepository.findById(id).orElseThrow(()-> new RuntimeException("l'element n'existe pasdans la ase de donnes"));
-            categorieRepository.save(categorieDansBD);
-
-    }
 
     /**
      * @Author Harold Roger
