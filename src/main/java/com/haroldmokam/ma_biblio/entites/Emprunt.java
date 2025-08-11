@@ -25,9 +25,11 @@ public class Emprunt {
     private boolean estRemis = false;
 
     @ManyToOne
+    @JoinColumn(name = "livre_id")
     private Livre livre;
 
     @ManyToOne
+    @JoinColumn(name = "utilisateur_id")
     private Utilisateur utilisateur;
 
 }

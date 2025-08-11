@@ -21,6 +21,7 @@ public class Utilisateur {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String nom;
+    @Column(unique = true)
     private String mail;
     @Column(unique = true)
     private String matricule;
@@ -32,5 +33,7 @@ public class Utilisateur {
 
     @OneToMany(mappedBy = "utilisateurDestinataire", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Notification> notifications;
+    @OneToMany( mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    private List<Emprunt> emprunts;
 
 }

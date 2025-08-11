@@ -7,12 +7,14 @@ import com.haroldmokam.ma_biblio.entites.Emprunt;
 import com.haroldmokam.ma_biblio.entites.EtatEmprunt;
 import com.haroldmokam.ma_biblio.entites.Livre;
 import com.haroldmokam.ma_biblio.entites.Utilisateur;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -83,7 +85,8 @@ public class EmpruntService {
 
     //Modification d'un emprunt. Ici on va prolonger encore la date de deux semaines.
     public void prolongementDateEmprunt( int idEmprunt) {
-        Emprunt emprunt = empruntRepository.findById(idEmprunt);
+       Optional <Emprunt> emprunt1 = empruntRepository.findById(idEmprunt);
+       Emprunt emprunt = emprunt1.orElseThrow(()-> new EntityNotFoundException("Emprunt " + idEmprunt + " n'existe pas"));
         emprunt.setDateFinEmprunt(emprunt.getDateFinEmprunt().plusWeeks(2));
         emprunt.setEtatEmprunt(EtatEmprunt.EN_COURS);
         empruntRepository.save(emprunt);
@@ -133,6 +136,15 @@ public class EmpruntService {
         return empruntRepository.findByEtatEmprunt(EtatEmprunt.REMIS);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Emprunt getEmprunt(int id) {
+        Optional<Emprunt> empruntOptional = empruntRepository.findById(id);
+        return empruntOptional.orElseThrow(()-> new EntityNotFoundException("Emprunt non trouve"));
+    }
     //D'autres methodes sont a venir Par exemple pour les filtres beaucoup plus avances des filtres. Pour l'instant on travaille d'abord avec ceux ci.
     /**
      * Ici on va creer des filtres de recherches plus avances par exemples :

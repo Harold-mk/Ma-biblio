@@ -8,9 +8,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface EmpruntRepository extends JpaRepository<Emprunt, Integer> {
-    public Emprunt findById(int id);
+    public Optional<Emprunt> findById(int id);
     public List<Emprunt> findAllByOrderByDateDebutEmpruntAsc();
     public List<Emprunt> findByDateDebutEmpruntLessThanEqual(LocalDate empruntDate);
     public List<Emprunt> findByDateFinEmpruntGreaterThanEqual(LocalDate empruntDate);

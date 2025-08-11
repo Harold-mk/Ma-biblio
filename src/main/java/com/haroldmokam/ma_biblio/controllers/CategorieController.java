@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @AllArgsConstructor
-@RequestMapping
+@RequestMapping(path = "/categorie")
 public class CategorieController {
     private final CategorieService categorieService;
 
@@ -38,7 +38,7 @@ public class CategorieController {
         log.info("La categorie %s a ete supprimee de la base de donnees", categorieDansBD.getLibelle());
     }
 
-    @GetMapping(path = "/Liste")
+    @GetMapping(path = "/liste")
     public List<Categorie> listerCategorie() {
         log.info("Liste des categories");
         return categorieService.rechercherAllCategories();

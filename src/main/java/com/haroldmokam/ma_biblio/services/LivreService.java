@@ -78,7 +78,7 @@ public class LivreService {
 
     //rechercher un livre par auteur
     public List<Livre> afficherListeLivreParAuteur(String auteur){
-        List<Livre> livres = livreRepository.findByAuteur(auteur);
+        List<Livre> livres = livreRepository.findByAuteurContainingIgnoreCase(auteur);
         if(livres.isEmpty()){
             throw new RuntimeException("La liste est vide");
         }

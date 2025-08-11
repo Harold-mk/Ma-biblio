@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CategorieRepository extends JpaRepository<Categorie, Integer> {
-    public Categorie findById(int id);
+    public Optional<Categorie> findById(int id);
     public Optional<Categorie> findByLibelle(String libelle);
 
     // Cette methode permet de rechercer une liste de Categorie en fonction du libelle en ignorant les Majuscules et Minuscules.

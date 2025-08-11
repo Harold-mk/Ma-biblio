@@ -32,16 +32,15 @@ public class CategorieService {
     }
 
     public void modifierCategorie(int id, Categorie categorie) {
-        Categorie categorieDansBD = categorieRepository.findById(id);
-        if(categorieDansBD != null) {
-            categorieDansBD.setLibelle(categorie.getLibelle());
+        Categorie categorieDansBD = categorieRepository.findById(id).orElseThrow(()-> new RuntimeException("l'element n'existe pasdans la ase de donnes"));
             categorieRepository.save(categorieDansBD);
-        }
-        else{
-            throw new RuntimeException("L'element n'existe pas dans la base de donnees.");
-        }
+
     }
 
+    /**
+     * @Author Harold Roger
+     * @param categorie
+     */
     public void supprimerCategorie(Categorie categorie) {
         Optional<Categorie> categorieDansBD = categorieRepository.findByLibelle(categorie.getLibelle());
         if(categorieDansBD.isPresent()) {
@@ -65,10 +64,7 @@ public class CategorieService {
     }
 
     public Categorie rechercherCategorieParId(int id) {
-       Categorie categorieDansBD = categorieRepository.findById(id);
-       if(categorieDansBD == null) {
-           throw new RuntimeException("Cette categorie n'existe pas ou a deja ete supprimee.");
-       }
-       return categorieDansBD;
+       return categorieRepository.findById(id).
+               orElseThrow(()-> new RuntimeException("l'element n'existe pas dans la base de donnees"));
     }
 }

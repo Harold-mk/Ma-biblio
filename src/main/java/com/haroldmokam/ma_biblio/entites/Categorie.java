@@ -19,6 +19,6 @@ public class Categorie {
     @Id
     private int id;
     private String libelle;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "categorie", cascade = CascadeType.ALL)
     private List<Livre> livres;
 }
