@@ -10,22 +10,28 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface EmpruntRepository extends JpaRepository<Emprunt, Integer> {
-    public Optional<Emprunt> findById(int id);
-    public List<Emprunt> findAllByOrderByDateDebutEmpruntAsc();
-    public List<Emprunt> findByDateDebutEmpruntLessThanEqual(LocalDate empruntDate);
-    public List<Emprunt> findByDateFinEmpruntGreaterThanEqual(LocalDate empruntDate);
-    public List <Emprunt> findByDateDebutEmpruntGreaterThanEqual(LocalDate empruntDate);
-    public List<Emprunt> findByDateFinEmpruntBetween(LocalDate emprunt1, LocalDate emprunt2);
-    public List<Emprunt> findByDateDebutEmpruntBetween(LocalDate emprunt1, LocalDate emprunt2);
+/**
+ * @author Mokam Harold
+ */
 
+ public interface EmpruntRepository extends JpaRepository<Emprunt, Integer> {
+     Optional<Emprunt> findById(int id);
+     List<Emprunt> findAllByOrderByDateDebutEmpruntAsc();
+    /**
+     *  ############################# Liste des methode CRUD pour notre filtre ##################################################
+     *  List<Emprunt> findByDateDebutEmpruntLessThanEqual(LocalDate empruntDate);
+     List<Emprunt> findByDateFinEmpruntGreaterThanEqual(LocalDate empruntDate);
+     List <Emprunt> findByDateDebutEmpruntGreaterThanEqual(LocalDate empruntDate);
+     List<Emprunt> findByDateFinEmpruntBetween(LocalDate emprunt1, LocalDate emprunt2);
+     List<Emprunt> findByDateDebutEmpruntBetween(LocalDate emprunt1, LocalDate emprunt2);
+**/
     List<Emprunt> findByDateDebutEmprunt(LocalDate dateDebutEmprunt);
-    public List<Emprunt> findByDateFinEmprunt(LocalDate empruntDate);
+     List<Emprunt> findByDateFinEmprunt(LocalDate empruntDate);
 
     List<Emprunt> findByUtilisateur(Utilisateur utilisateur);
 
     List<Emprunt> findByLivre(Livre livre);
 
     List<Emprunt> findByEtatEmprunt(EtatEmprunt etatEmprunt);
-    List<Emprunt> findByEtatEmpruntAndEstRemis(EtatEmprunt etatEmprunt, boolean estRemis);
+    //List<Emprunt> findByEtatEmpruntAndEstRemis(EtatEmprunt etatEmprunt, boolean estRemis);
 }

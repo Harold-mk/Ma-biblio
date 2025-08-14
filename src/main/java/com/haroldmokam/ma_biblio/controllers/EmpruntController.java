@@ -6,7 +6,6 @@ import com.haroldmokam.ma_biblio.entites.Emprunt;
 import com.haroldmokam.ma_biblio.entites.Livre;
 import com.haroldmokam.ma_biblio.entites.Utilisateur;
 import com.haroldmokam.ma_biblio.services.EmpruntService;
-import com.haroldmokam.ma_biblio.services.UtilisateurService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -28,7 +26,8 @@ public class EmpruntController {
 
     /**
      * Cette methode permet d'ajouter un emprunt en fonction d'une personne et tout.
-     * @param emprunt
+     * @param emprunt qui va permettre de creer les emprunts dans une version ulterieure on va utiliser les DTO
+     *
      */
     @PostMapping(path = "/ajouter", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void ajouterEmprunt(@RequestBody Emprunt emprunt) {
@@ -38,7 +37,7 @@ public class EmpruntController {
 
     /**
      * Ce controleur permet de prolonger un emprunt de deux semaines. Pour l'instant la date d'emprunt est fixe mais selon les besoins de tata Marlyse on peut le modifier.
-     * @param id
+     * @param id qui represente l'ID denl'emprunt qu'on va prolonger
      */
     @PutMapping(path ="/prolonger/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void prolongerEmprunt(@PathVariable int id) {
@@ -46,7 +45,7 @@ public class EmpruntController {
     }
 
     /**
-      * @param id
+      * @param id qui represente l'ID denl'emprunt qu'on va annuler
      * Ce controleur permet d'effectuer la remise d'un emprunt par le bibliothecaire.
      */
     @PutMapping(path ="/remise/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -56,7 +55,7 @@ public class EmpruntController {
     }
 
     /**
-     *  ############################# BON ICI C'EST LA PARTIE DEDIES AUX RECHERCHES DES EMPRUNTS EN FONCTION DES ENTITES QUI LE CONSTITUE.
+     *  ############### BON ICI C'EST LA PARTIE DEDIES AUX RECHERCHES DES EMPRUNTS EN FONCTION DES ENTITES QUI LE CONSTITUE.########################
      */
 
     @GetMapping(path = "/rechercher/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -66,7 +65,7 @@ public class EmpruntController {
 
     @GetMapping(path = "/listeTotale", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Emprunt> listeTotaleEmprunt() {
-        return empruntService.ListetotaleDesEmprunts();
+        return empruntService.listetotaleDesEmprunts();
     }
 
     @GetMapping(path = "/DelaiExpire", produces = MediaType.APPLICATION_JSON_VALUE)

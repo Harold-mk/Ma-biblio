@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +24,6 @@ public class EmpruntService {
 
     //Injection des dependances
     private final EmpruntRepository empruntRepository;
-    private final LivreService livreService;
     private final NotificationService notificationService;
     private final UtilisateurRepository utilisateurRepository;
     private final LivreRepository livreRepository;
@@ -38,7 +36,7 @@ public class EmpruntService {
         emprunt.setLivre(livre);
         emprunt.setDateDebutEmprunt(localDate);
         emprunt.setEtatEmprunt( EtatEmprunt.EN_COURS);
-        emprunt.setDateFinEmprunt(localDate.plusWeeks(2)); // Ajoute deux semaines a la date locale pour la date de remises du document
+        emprunt.setDateFinEmprunt(localDate.plusWeeks(2)); // Ajoute deux semaines à la date locale pour la date de remises du document
         // Inserer la methode de notification a l'utilisateur pour les utilisateurs
         notificationService.notificationEmprunt(emprunt);
         // Methode pour inserer le nombre d'emprunts restants...
@@ -53,11 +51,12 @@ public class EmpruntService {
             empruntRepository.save(emprunt);
         }
         else {
+            throw new RuntimeException("Operation impossible : Soit l'utilisateur ne dispose plus d'emprunt, soit il n'existe plus d'exemplaire");
         }
 
     }
 
-    // Changement de l'etat d'un emprunt: Du genre si un le livre a ete remis alors on change l'etat emprunt.
+    // Changement de l'etat d'un emprunt : Du genre si un le livre a ete remis alors on change l'etat emprunt.
     public void remiseEmprunt(Emprunt emprunt) {
 
         Utilisateur utilisateur1 = emprunt.getUtilisateur() ;
@@ -96,7 +95,7 @@ public class EmpruntService {
     // Ici on va creer une option qui doit gerer faire en sorte que le bibliothecaire valide et puis un message de notification est envoye a l'utilisateur pour lui faire signe
 
     // Historique de validation
-    public List<Emprunt> ListetotaleDesEmprunts(){
+    public List<Emprunt> listetotaleDesEmprunts(){
         return empruntRepository.findAllByOrderByDateDebutEmpruntAsc();
     }
 
@@ -138,23 +137,23 @@ public class EmpruntService {
 
     /**
      *
-     * @param id
-     * @return
+     * @param id il s'agit de l'id de l'emprunt poue oermettre de trouver ce dernier
+     * @return Emprunt
      */
     public Emprunt getEmprunt(int id) {
         Optional<Emprunt> empruntOptional = empruntRepository.findById(id);
         return empruntOptional.orElseThrow(()-> new EntityNotFoundException("Emprunt non trouve"));
     }
     //D'autres methodes sont a venir Par exemple pour les filtres beaucoup plus avances des filtres. Pour l'instant on travaille d'abord avec ceux ci.
-    /**
-     * Ici on va creer des filtres de recherches plus avances par exemples :
-     * - La liste des Emprunts dont les dates de remises sont avant une date precise.
-     * - La liste des Emprunts dont les dates de debut sont avant une date precise.
-     * - La liste des Emprunts dont les dates de debut sont apres une date precise.
-     * - La liste des Emprunts dont les dates de debut sont entre deux dates precises.
-     * - la liste des emprunts dont les dates de remises  sont entre deux dates precises.
-     * - La liste des emprunts en fonction des livres et des dates.
-     * - La lite des emprunts en fonction des utilisateurs et des dates. Meme comme je ne vois pas trop la necessite ici mais bon...
-     * - Les services pour exporter l'historique des emprunts sous format PDF.
+    /*
+      Ici on va creer des filtres de recherches plus avances par exemples :
+      - La liste des Emprunts dont les dates de remises sont avant une date precise.
+      - La liste des Emprunts dont les dates de debut sont avant une date precise.
+      - La liste des Emprunts dont les dates de debut sont apres une date precise.
+      - La liste des Emprunts dont les dates de debut sont entre deux dates precises.
+      - la liste des emprunts dont les dates de remises  sont entre deux dates precises.
+      - La liste des emprunts en fonction des livres et des dates.
+      - La lite des emprunts en fonction des utilisateurs et des dates. Meme comme je ne vois pas trop la necessite ici mais bon...
+      - Les services pour exporter l'historique des emprunts sous format PDF.
      */
 }

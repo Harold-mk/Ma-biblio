@@ -2,13 +2,11 @@ package com.haroldmokam.ma_biblio.services;
 
 import com.haroldmokam.ma_biblio.Repositories.UtilisateurRepository;
 import com.haroldmokam.ma_biblio.entites.RoleUtilisateur;
-import com.haroldmokam.ma_biblio.entites.Statut;
 import com.haroldmokam.ma_biblio.entites.Utilisateur;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -44,7 +42,7 @@ public class UtilisateurService {
         );
     }
     public Utilisateur findUtilisateurByEmail(String email) {
-        return utilisateurRepository.findByEmail(email).orElseThrow(
+        return utilisateurRepository.findByMail(email).orElseThrow(
                 ()-> new RuntimeException(" l'utilisateur n'existe pas dans la base de donnes.")
         );
     }

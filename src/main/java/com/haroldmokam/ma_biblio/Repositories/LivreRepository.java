@@ -12,7 +12,6 @@ public interface LivreRepository extends JpaRepository<Livre, Integer> {
     Optional<Livre> findByTitre(String titre);
     List<Livre> findByTitreContainingIgnoreCase(String titre);
     List<Livre> findByCategorie(Categorie categorie);
-    List<Livre> findByAuteur(String auteur);
     List<Livre> findByAuteurContainingIgnoreCase(String auteur);
     Optional <Livre> findById(int id);
 }

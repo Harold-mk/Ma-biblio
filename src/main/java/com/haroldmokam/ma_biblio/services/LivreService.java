@@ -1,13 +1,13 @@
 package com.haroldmokam.ma_biblio.services;
 
-import com.haroldmokam.ma_biblio.Repositories.CategorieRepository;
+
 import com.haroldmokam.ma_biblio.Repositories.LivreRepository;
 import com.haroldmokam.ma_biblio.entites.Categorie;
 import com.haroldmokam.ma_biblio.entites.Livre;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +22,6 @@ public class LivreService {
 
     //Injection des dependances
     private final LivreRepository livreRepository;
-    private final CategorieService categorieService;
 
     // Creer un Livre
 
@@ -54,10 +53,6 @@ public class LivreService {
         else{
             throw new RuntimeException("Le livre que vous voulez supprimer n'existe pas.");
         }
-    }
-    //afficher la liste complete des livres
-    public List<Livre> afficherListeDesLivres(){
-       return livreRepository.findAll();
     }
 
     // rechercher un livre par titre

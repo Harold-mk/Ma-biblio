@@ -43,4 +43,5 @@ public class CategorieController {
         log.info("Liste des categories");
         return categorieService.rechercherAllCategories();
     }
+
 }
