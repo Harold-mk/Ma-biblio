@@ -5,6 +5,8 @@ import com.haroldmokam.ma_biblio.entites.RoleUtilisateur;
 import com.haroldmokam.ma_biblio.entites.Utilisateur;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,15 +19,19 @@ public class UtilisateurService {
     //Creer un utilisateur
     public void creerUtilisateur(Utilisateur utilisateur) {
         utilisateur.setNombreEmpruntRestant(5);
-        utilisateur.setRole(RoleUtilisateur.UTILISATEUR);// Par défaut, l'utilisateur est un utilisateur normal
+        utilisateur.setNombreEmpruntActif(5);
+        if (utilisateur.getRole() == null) {
+            utilisateur.setRole(RoleUtilisateur.EMPLOYÉ); // Par défaut, l'utilisateur est un employé
+        }
         utilisateurRepository.save(utilisateur);
     }
 
-    public void modifierUtilisateur(Utilisateur utilisateur) {
-        Utilisateur utilisateurdansLaBd = utilisateurRepository.findById(utilisateur.getId()).
+    public void modifierUtilisateur(int id, Utilisateur utilisateur) {
+        Utilisateur utilisateurdansLaBd = utilisateurRepository.findById(id).
                 orElseThrow(
                         ()-> new RuntimeException("l'utilisateur n'existe pas dans la base de donnes")
                 );
+        utilisateur.setId(id);
         utilisateurRepository.save(utilisateur);
     }
 
@@ -36,6 +42,40 @@ public class UtilisateurService {
     public List<Utilisateur> listeTotaleUtilisateurs() {
         return utilisateurRepository.findAll();
     }
+    
+    // Obtenir tous les utilisateurs avec pagination
+    public Page<Utilisateur> getAllUtilisateurs(Pageable pageable) {
+        return utilisateurRepository.findAll(pageable);
+    }
+    
+    // Obtenir tous les utilisateurs sans pagination
+    public List<Utilisateur> getAllUtilisateurs() {
+        return utilisateurRepository.findAll();
+    }
+    
+    // Compter le total des utilisateurs
+    public long countTotalUtilisateurs() {
+        return utilisateurRepository.count();
+    }
+    
+    // Obtenir un utilisateur par ID
+    public Utilisateur getUtilisateurById(int id) {
+        return utilisateurRepository.findById(id).orElseThrow(
+                ()-> new EntityNotFoundException("l'utilisateur n'existe pas dans la base de donnes.")
+        );
+    }
+    
+    // Rechercher des utilisateurs avec pagination
+    public Page<Utilisateur> rechercherUtilisateurs(String search, Pageable pageable) {
+        return utilisateurRepository.findByNomContainingIgnoreCaseOrMailContainingIgnoreCaseOrMatriculeContainingIgnoreCase(
+                search, search, search, pageable);
+    }
+    
+    // Rechercher des utilisateurs par rôle avec pagination
+    public Page<Utilisateur> rechercherUtilisateursParRole(RoleUtilisateur role, Pageable pageable) {
+        return utilisateurRepository.findByRole(role, pageable);
+    }
+    
     public Utilisateur findUtilisateurById(int id) {
         return utilisateurRepository.findById(id).orElseThrow(
                 ()-> new EntityNotFoundException("l'utilisateur n'existe pas dans la base de donnes.")

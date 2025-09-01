@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head}">
+    <title th:text="${categorie.id == null ? 'Nouvelle Catégorie' : 'Modifier Catégorie'}">Catégorie</title>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav th:replace="~{fragments/sidebar-admin :: sidebar}"></nav>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header th:replace="~{fragments/header :: header}"></header>
+            
+            <!-- Page Content -->
+            <div class="container-fluid">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800" th:text="${categorie.id == null ? 'Nouvelle Catégorie' : 'Modifier Catégorie'}">
+                            Catégorie
+                        </h1>
+                        <p class="text-muted" th:text="${categorie.id == null ? 'Créez une nouvelle catégorie de livres' : 'Modifiez les informations de la catégorie'}">
+                            Gestion des catégories
+                        </p>
+                    </div>
+                    <a href="/admin/categories" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Retour à la liste
+                    </a>
+                </div>
+
+                <!-- Alerts -->
+                <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+                <!-- Category Form -->
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-edit"></i> 
+                                    <span th:text="${categorie.id == null ? 'Créer une nouvelle catégorie' : 'Modifier la catégorie'}">
+                                        Formulaire Catégorie
+                                    </span>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/admin/categories}" th:object="${categorie}" method="post" class="needs-validation" novalidate>
+                                    <input type="hidden" th:field="*{id}" />
+                                    
+                                    <!-- Nom de la catégorie -->
+                                    <div class="mb-3">
+                                        <label for="libelle" class="form-label">
+                                            Nom de la catégorie <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="libelle" th:field="*{libelle}" 
+                                               placeholder="Ex: Fiscalité, Comptabilité, Droit..." required>
+                                        <div class="invalid-feedback">
+                                            Le nom de la catégorie est requis.
+                                        </div>
+                                        <div th:if="${#fields.hasErrors('libelle')}" class="text-danger small">
+                                            <span th:errors="*{libelle}"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Description -->
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label">Description</label>
+                                        <textarea class="form-control" id="description" th:field="*{description}" 
+                                                  rows="4" placeholder="Description détaillée de la catégorie..."></textarea>
+                                        <div class="form-text">
+                                            Décrivez brièvement le contenu de cette catégorie pour aider les utilisateurs.
+                                        </div>
+                                        <div th:if="${#fields.hasErrors('description')}" class="text-danger small">
+                                            <span th:errors="*{description}"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Informations sur les livres existants -->
+                                    <div th:if="${categorie.id != null && categorie.livres != null && !categorie.livres.isEmpty()}" class="mb-3">
+                                        <div class="alert alert-info">
+                                            <h6 class="alert-heading">
+                                                <i class="fas fa-info-circle"></i> Livres dans cette catégorie
+                                            </h6>
+                                            <p class="mb-2">
+                                                Cette catégorie contient actuellement 
+                                                <strong th:text="${categorie.livres.size()}">0</strong> livre(s).
+                                            </p>
+                                            <small>
+                                                La modification de cette catégorie n'affectera pas les livres existants.
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="d-flex justify-content-between">
+                                        <a href="/admin/categories" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times"></i> Annuler
+                                        </a>
+                                        <div>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save"></i> 
+                                                <span th:text="${categorie.id == null ? 'Créer' : 'Modifier'}">Enregistrer</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script th:replace="~{fragments/scripts :: scripts}"></script>
+    <script>
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+</body>
+</html>

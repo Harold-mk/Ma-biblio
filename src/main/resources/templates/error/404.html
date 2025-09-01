@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page non trouvée - Biblio-Tech</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center min-vh-100 align-items-center">
+            <div class="col-md-8 col-lg-6 text-center">
+                <!-- Error Icon -->
+                <div class="mb-4">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 120px; height: 120px;">
+                        <i class="fas fa-exclamation-triangle fa-3x"></i>
+                    </div>
+                </div>
+                
+                <!-- Error Message -->
+                <h1 class="display-1 text-primary fw-bold mb-3">404</h1>
+                <h2 class="h3 text-dark mb-3">Page non trouvée</h2>
+                <p class="text-muted mb-4">
+                    Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
+                    <br>
+                    Vérifiez l'URL ou utilisez les liens ci-dessous pour naviguer.
+                </p>
+                
+                <!-- Navigation Links -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <a href="/admin/dashboard" class="btn btn-primary w-100">
+                            <i class="fas fa-tachometer-alt me-2"></i>Tableau de bord
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/admin/livres" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-book me-2"></i>Gestion des livres
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <a href="/admin/emprunts" class="btn btn-outline-success w-100">
+                            <i class="fas fa-exchange-alt me-2"></i>Gestion des emprunts
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="/admin/utilisateurs" class="btn btn-outline-info w-100">
+                            <i class="fas fa-users me-2"></i>Gestion des utilisateurs
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Back Button -->
+                <div class="mb-4">
+                    <button onclick="history.back()" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Retour en arrière
+                    </button>
+                </div>
+                
+                <!-- Help Section -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title text-primary mb-3">
+                            <i class="fas fa-question-circle me-2"></i>Besoin d'aide ?
+                        </h6>
+                        <p class="card-text text-muted small mb-0">
+                            Si vous pensez qu'il s'agit d'une erreur, contactez l'administrateur système 
+                            ou consultez la documentation utilisateur.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="text-center mt-4">
+                    <p class="text-muted small">
+                        © 2024 Biblio-Tech. Tous droits réservés.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

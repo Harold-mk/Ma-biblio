@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head}">
+    <title>Catalogue des Livres</title>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav th:replace="~{fragments/sidebar-user :: sidebar}"></nav>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header th:replace="~{fragments/header :: header}"></header>
+            
+            <!-- Page Content -->
+            <div class="container-fluid">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Catalogue des Livres</h1>
+                        <p class="text-muted">Parcourez et recherchez les livres disponibles</p>
+                    </div>
+                    <div>
+                        <a href="/user/dashboard" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour au dashboard
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Alerts -->
+                <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+                <!-- Search and Filter -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form th:action="@{/user/catalogue}" method="get" class="row g-3">
+                            <div class="col-md-4">
+                                <label for="search" class="form-label">Rechercher</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       th:value="${param.search}" placeholder="Titre, auteur...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="categorie" class="form-label">Catégorie</label>
+                                <select class="form-select" id="categorie" name="categorie">
+                                    <option value="">Toutes les catégories</option>
+                                    <option th:each="cat : ${categories}" 
+                                            th:value="${cat.id}" 
+                                            th:text="${cat.libelle}"
+                                            th:selected="${param.categorie != null && param.categorie[0] == cat.id.toString()}">
+                                        Catégorie
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="disponibilite" class="form-label">Disponibilité</label>
+                                <select class="form-select" id="disponibilite" name="disponibilite">
+                                    <option value="">Tous</option>
+                                    <option value="disponible" th:selected="${param.disponibilite == 'disponible'}">Disponibles</option>
+                                    <option value="indisponible" th:selected="${param.disponibilite == 'indisponible'}">Indisponibles</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-outline-primary me-2">
+                                    <i class="fas fa-search"></i> Rechercher
+                                </button>
+                                <a href="/user/catalogue" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Effacer
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Books Grid -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5>
+                                <i class="fas fa-book"></i> Livres trouvés
+                                <span class="badge bg-primary ms-2" th:text="${livres.totalElements}">0</span>
+                            </h5>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-primary active" id="gridView">
+                                    <i class="fas fa-th"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" id="listView">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid View -->
+                <div id="gridViewContent" class="row">
+                    <div th:each="livre : ${livres.content}" class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title mb-0" th:text="${livre.titre}">Titre</h6>
+                                    <span class="badge" 
+                                          th:classappend="${livre.nbreExemplairesRestant > 0 ? 'bg-success' : 'bg-danger'}"
+                                          th:text="${livre.nbreExemplairesRestant > 0 ? 'Disponible' : 'Indisponible'}">
+                                        Statut
+                                    </span>
+                                </div>
+                                <p class="card-text text-muted small" th:text="${livre.auteur}">Auteur</p>
+                                <p class="card-text small" th:if="${livre.categorie != null}" th:text="${livre.categorie.libelle}">Catégorie</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-copy"></i> 
+                                        <span th:text="${livre.nbreExemplairesRestant} + '/' + ${livre.nbreExemplaires}">0/0</span> disponibles
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <div class="d-grid">
+                                    <a th:href="@{/user/livres/{id}(id=${livre.id})}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> Voir détails
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- List View (Hidden by default) -->
+                <div id="listViewContent" class="row" style="display: none;">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Titre</th>
+                                                <th>Auteur</th>
+                                                <th>Catégorie</th>
+                                                <th>Disponibilité</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="livre : ${livres.content}">
+                                                <td>
+                                                    <strong th:text="${livre.titre}">Titre</strong>
+                                                </td>
+                                                <td th:text="${livre.auteur}">Auteur</td>
+                                                <td th:text="${livre.categorie != null ? livre.categorie.libelle : '-'}">Catégorie</td>
+                                                <td>
+                                                    <span class="badge" 
+                                                          th:classappend="${livre.nbreExemplairesRestant > 0 ? 'bg-success' : 'bg-danger'}"
+                                                          th:text="${livre.nbreExemplairesRestant} + '/' + ${livre.nbreExemplaires}">0/0</span>
+                                                </td>
+                                                <td>
+                                                    <a th:href="@{/user/livres/{id}(id=${livre.id})}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye"></i> Voir
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(livres.content)}" class="text-center py-5">
+                    <div class="text-muted">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <h5>Aucun livre trouvé</h5>
+                        <p>Essayez de modifier vos critères de recherche</p>
+                        <a href="/user/catalogue" class="btn btn-primary">
+                            <i class="fas fa-times"></i> Effacer les filtres
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div th:if="${livres.totalPages > 1}" class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Pagination du catalogue">
+                        <ul class="pagination">
+                            <!-- Previous -->
+                            <li class="page-item" th:classappend="${livres.first} ? 'disabled'">
+                                <a class="page-link" th:href="@{/user/catalogue(page=${livres.number - 1}, size=${livres.size}, search=${param.search}, categorie=${param.categorie}, disponibilite=${param.disponibilite})}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            
+                            <!-- Page Numbers -->
+                            <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, livres.totalPages - 1)}"
+                                th:classappend="${pageNumber == livres.number} ? 'active'">
+                                <a class="page-link" th:href="@{/user/catalogue(page=${pageNumber}, size=${livres.size}, search=${param.search}, categorie=${param.categorie}, disponibilite=${param.disponibilite})}"
+                                   th:text="${pageNumber + 1}">1</a>
+                            </li>
+                            
+                            <!-- Next -->
+                            <li class="page-item" th:classappend="${livres.last} ? 'disabled'">
+                                <a class="page-link" th:href="@{/user/catalogue(page=${livres.number + 1}, size=${livres.size}, search=${param.search}, categorie=${param.categorie}, disponibilite=${param.disponibilite})}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script th:replace="~{fragments/scripts :: scripts}"></script>
+    <script>
+        // Toggle between grid and list view
+        document.getElementById('gridView').addEventListener('click', function() {
+            document.getElementById('gridViewContent').style.display = 'flex';
+            document.getElementById('listViewContent').style.display = 'none';
+            document.getElementById('gridView').classList.add('active');
+            document.getElementById('listView').classList.remove('active');
+        });
+
+        document.getElementById('listView').addEventListener('click', function() {
+            document.getElementById('gridViewContent').style.display = 'none';
+            document.getElementById('listViewContent').style.display = 'block';
+            document.getElementById('listView').classList.add('active');
+            document.getElementById('gridView').classList.remove('active');
+        });
+    </script>
+</body>
+</html>

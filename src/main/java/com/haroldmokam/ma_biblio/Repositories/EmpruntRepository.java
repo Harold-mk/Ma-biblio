@@ -4,6 +4,8 @@ import com.haroldmokam.ma_biblio.entites.Emprunt;
 import com.haroldmokam.ma_biblio.entites.EtatEmprunt;
 import com.haroldmokam.ma_biblio.entites.Livre;
 import com.haroldmokam.ma_biblio.entites.Utilisateur;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -34,4 +36,16 @@ import java.util.Optional;
 
     List<Emprunt> findByEtatEmprunt(EtatEmprunt etatEmprunt);
     //List<Emprunt> findByEtatEmpruntAndEstRemis(EtatEmprunt etatEmprunt, boolean estRemis);
+    
+    // Méthodes pour la pagination et recherche
+    Page<Emprunt> findByLivreTitreContainingIgnoreCaseOrUtilisateurNomContainingIgnoreCase(
+            String livreTitre, String utilisateurNom, Pageable pageable);
+    Page<Emprunt> findByEtatEmprunt(EtatEmprunt etatEmprunt, Pageable pageable);
+    Page<Emprunt> findByUtilisateurNomContainingIgnoreCase(String utilisateurNom, Pageable pageable);
+    
+    // Méthodes pour compter
+    long countByEtatEmprunt(EtatEmprunt etatEmprunt);
+    
+    // Méthodes pour les utilisateurs
+    List<Emprunt> findByUtilisateurId(int utilisateurId);
 }

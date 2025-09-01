@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head}">
+    <title>Gestion des Catégories</title>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav th:replace="~{fragments/sidebar-admin :: sidebar}"></nav>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header th:replace="~{fragments/header :: header}"></header>
+            
+            <!-- Page Content -->
+            <div class="container-fluid">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Gestion des Catégories</h1>
+                        <p class="text-muted">Gérez les catégories de livres de la bibliothèque</p>
+                    </div>
+                    <a href="/admin/categories/create" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nouvelle Catégorie
+                    </a>
+                </div>
+
+                <!-- Alerts -->
+                <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+                <!-- Search and Filter -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form th:action="@{/admin/categories}" method="get" class="row g-3">
+                            <div class="col-md-6">
+                                <label for="search" class="form-label">Rechercher</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       th:value="${param.search}" placeholder="Nom de la catégorie...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="sort" class="form-label">Trier par</label>
+                                <select class="form-select" id="sort" name="sort">
+                                    <option value="libelle,asc" th:selected="${param.sort == 'libelle,asc'}">Nom (A-Z)</option>
+                                    <option value="libelle,desc" th:selected="${param.sort == 'libelle,desc'}">Nom (Z-A)</option>
+                                    <option value="id,asc" th:selected="${param.sort == 'id,asc'}">Plus ancien</option>
+                                    <option value="id,desc" th:selected="${param.sort == 'id,desc'}">Plus récent</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-outline-primary me-2">
+                                    <i class="fas fa-search"></i> Rechercher
+                                </button>
+                                <a href="/admin/categories" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Effacer
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Categories Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list"></i> Liste des Catégories
+                            <span class="badge bg-primary ms-2" th:text="${categories.totalElements}">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nom</th>
+                                        <th>Description</th>
+                                        <th>Nombre de Livres</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="categorie : ${categories.content}" th:if="${!#lists.isEmpty(categories.content)}">
+                                        <td th:text="${categorie.id}">1</td>
+                                        <td>
+                                            <strong th:text="${categorie.libelle}">Catégorie</strong>
+                                        </td>
+                                        <td th:text="${categorie.description}">Description</td>
+                                        <td>
+                                            <span class="badge bg-info" th:text="${categorie.livres.size()}">0</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a th:href="@{/admin/categories/{id}(id=${categorie.id})}" 
+                                                   class="btn btn-sm btn-outline-primary" title="Voir">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a th:href="@{/admin/categories/{id}/edit(id=${categorie.id})}" 
+                                                   class="btn btn-sm btn-outline-warning" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        th:onclick="'deleteCategorie(' + ${categorie.id} + ')'" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(categories.content)}">
+                                        <td colspan="5" class="text-center py-4">
+                                            <div class="text-muted">
+                                                <i class="fas fa-inbox fa-3x mb-3"></i>
+                                                <p>Aucune catégorie trouvée</p>
+                                                <a href="/admin/categories/create" class="btn btn-primary">
+                                                    <i class="fas fa-plus"></i> Créer la première catégorie
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div th:if="${categories.totalPages > 1}" class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Pagination des catégories">
+                        <ul class="pagination">
+                            <!-- Previous -->
+                            <li class="page-item" th:classappend="${categories.first} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/categories(page=${categories.number - 1}, size=${categories.size}, search=${param.search}, sort=${param.sort})}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            
+                            <!-- Page Numbers -->
+                            <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, categories.totalPages - 1)}"
+                                th:classappend="${pageNumber == categories.number} ? 'active'">
+                                <a class="page-link" th:href="@{/admin/categories(page=${pageNumber}, size=${categories.size}, search=${param.search}, sort=${param.sort})}"
+                                   th:text="${pageNumber + 1}">1</a>
+                            </li>
+                            
+                            <!-- Next -->
+                            <li class="page-item" th:classappend="${categories.last} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/categories(page=${categories.number + 1}, size=${categories.size}, search=${param.search}, sort=${param.sort})}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Êtes-vous sûr de vouloir supprimer cette catégorie ? Cette action est irréversible.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <form id="deleteForm" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script th:replace="~{fragments/scripts :: scripts}"></script>
+    <script>
+        function deleteCategorie(id) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) {
+                fetch(`/admin/categories/${id}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Erreur lors de la suppression');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

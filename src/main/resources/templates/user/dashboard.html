@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head}">
+    <title>Mon Tableau de bord</title>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav th:replace="~{fragments/sidebar-user :: sidebar}"></nav>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header th:replace="~{fragments/header :: header}"></header>
+            
+            <!-- Page Content -->
+            <div class="container-fluid">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Mon Tableau de bord</h1>
+                        <p class="text-muted">Bienvenue dans votre espace personnel</p>
+                    </div>
+                    <div>
+                        <a href="/user/catalogue" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Parcourir le catalogue
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Alerts -->
+                <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+                <!-- User Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Emprunts Actifs
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${empruntsActifs}">0</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-book fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Emprunts Restants
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${empruntsRestants}">5</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-plus-circle fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Emprunts en Retard
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${empruntsEnRetard}">0</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Notifications Non Lues
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" th:text="${notificationsNonLues}">0</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-bell fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Current Loans -->
+                    <div class="col-lg-8">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-book"></i> Mes Emprunts Actuels
+                                </h6>
+                                <a href="/user/emprunts" class="btn btn-sm btn-primary">
+                                    Voir tous
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${!#lists.isEmpty(mesEmprunts)}">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Livre</th>
+                                                    <th>Date d'emprunt</th>
+                                                    <th>Date de retour</th>
+                                                    <th>Statut</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="emprunt : ${mesEmprunts}">
+                                                    <td>
+                                                        <strong th:text="${emprunt.livre.titre}">Titre</strong>
+                                                        <br>
+                                                        <small class="text-muted" th:text="${emprunt.livre.auteur}">Auteur</small>
+                                                    </td>
+                                                    <td th:text="${#temporals.format(emprunt.dateDebutEmprunt, 'dd/MM/yyyy')}">Date</td>
+                                                    <td>
+                                                        <span th:text="${#temporals.format(emprunt.dateFinEmprunt, 'dd/MM/yyyy')}" 
+                                                              th:class="${emprunt.dateFinEmprunt.isBefore(#temporals.createToday()) ? 'text-danger' : ''}">Date</span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge" 
+                                                              th:classappend="${emprunt.etatEmprunt.name() == 'EN_COURS' ? 'bg-success' : 'bg-warning'}"
+                                                              th:text="${emprunt.etatEmprunt.name() == 'EN_COURS' ? 'En cours' : 'En retard'}">Statut</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <a th:href="@{/user/emprunts/{id}(id=${emprunt.id})}" 
+                                                               class="btn btn-sm btn-outline-primary" title="Voir">
+                                                                <i class="fas fa-eye"></i>
+                                                            </a>
+                                                            <button type="button" class="btn btn-sm btn-outline-warning" 
+                                                                    th:onclick="'prolongerEmprunt(' + ${emprunt.id} + ')'" title="Prolonger">
+                                                                <i class="fas fa-clock"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div th:if="${#lists.isEmpty(mesEmprunts)}" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="fas fa-book fa-3x mb-3"></i>
+                                        <p>Aucun emprunt actuel</p>
+                                        <a href="/user/catalogue" class="btn btn-primary">
+                                            <i class="fas fa-search"></i> Parcourir le catalogue
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Notifications -->
+                    <div class="col-lg-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-bell"></i> Notifications Récentes
+                                </h6>
+                                <a href="/user/notifications" class="btn btn-sm btn-primary">
+                                    Voir toutes
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${!#lists.isEmpty(mesNotifications)}">
+                                    <div th:each="notification : ${mesNotifications}" class="notification-item mb-3">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1" th:text="${notification.title}">Titre</h6>
+                                                <p class="mb-1 text-muted small" th:text="${#strings.abbreviate(notification.message, 80)}">Message</p>
+                                                <small class="text-muted" th:text="${#temporals.format(notification.dateCreation, 'dd/MM/yyyy HH:mm')}">Date</small>
+                                            </div>
+                                            <span class="badge" th:if="${!notification.lu}" 
+                                                  th:classappend="'bg-warning'">Nouveau</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div th:if="${#lists.isEmpty(mesNotifications)}" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="fas fa-bell fa-3x mb-3"></i>
+                                        <p>Aucune notification</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="card shadow">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-bolt"></i> Actions Rapides
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-grid gap-2">
+                                    <a href="/user/catalogue" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Parcourir le catalogue
+                                    </a>
+                                    <a href="/user/emprunts" class="btn btn-outline-primary">
+                                        <i class="fas fa-list"></i> Mes emprunts
+                                    </a>
+                                    <a href="/user/historique" class="btn btn-outline-secondary">
+                                        <i class="fas fa-history"></i> Historique
+                                    </a>
+                                    <a href="/user/profile" class="btn btn-outline-info">
+                                        <i class="fas fa-user"></i> Mon profil
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script th:replace="~{fragments/scripts :: scripts}"></script>
+    <script>
+        function prolongerEmprunt(id) {
+            if (confirm('Voulez-vous prolonger cet emprunt de 2 semaines ?')) {
+                fetch(`/user/emprunts/${id}/prolonger`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Erreur lors de la prolongation');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

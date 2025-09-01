@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${emprunt.id != null ? 'Modifier l\'Emprunt - Biblio-Tech' : 'Nouvel Emprunt - Biblio-Tech'}">Emprunt - Biblio-Tech</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div th:replace="~{fragments/sidebar-admin :: sidebar-admin}"></div>
+            
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" th:text="${emprunt.id != null ? 'Modifier l\'Emprunt' : 'Nouvel Emprunt'}">Emprunt</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <a href="/admin/emprunts" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Flash Messages -->
+                <div th:replace="~{fragments/alerts :: alerts}"></div>
+                
+                <!-- Loan Form -->
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-exchange-alt me-2"></i>
+                            <span th:text="${emprunt.id != null ? 'Modifier les informations de l\'emprunt' : 'Créer un nouvel emprunt'}">Informations de l'emprunt</span>
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/admin/emprunts}" th:object="${emprunt}" method="post" class="needs-validation" novalidate>
+                            <input type="hidden" th:field="*{id}">
+                            
+                            <div class="row">
+                                <!-- Left Column - Loan Information -->
+                                <div class="col-md-8">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="utilisateur" class="form-label">
+                                                <i class="fas fa-user me-1"></i>Utilisateur <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-select" 
+                                                    id="utilisateur" 
+                                                    th:field="*{utilisateur}"
+                                                    required>
+                                                <option value="">Sélectionnez un utilisateur</option>
+                                                <option th:each="user : ${utilisateurs}" 
+                                                        th:value="${user.id}" 
+                                                        th:text="${user.nom + ' ' + user.prenom + ' (' + user.matricule + ')'}"
+                                                        th:selected="${user.id == emprunt.utilisateur.id}">Utilisateur</option>
+                                            </select>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('utilisateur')}" th:errors="*{utilisateur}">
+                                                L'utilisateur est requis
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label for="livre" class="form-label">
+                                                <i class="fas fa-book me-1"></i>Livre <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-select" 
+                                                    id="livre" 
+                                                    th:field="*{livre}"
+                                                    required>
+                                                <option value="">Sélectionnez un livre</option>
+                                                <option th:each="book : ${livres}" 
+                                                        th:value="${book.id}" 
+                                                        th:text="${book.titre + ' par ' + book.auteur + ' (' + book.nbreExemplairesRestant + ' dispo)'}"
+                                                        th:selected="${book.id == emprunt.livre.id}"
+                                                        th:disabled="${book.nbreExemplairesRestant <= 0}">Livre</option>
+                                            </select>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('livre')}" th:errors="*{livre}">
+                                                Le livre est requis
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="dateDebutEmprunt" class="form-label">
+                                                <i class="fas fa-calendar-plus me-1"></i>Date d'emprunt <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="date" 
+                                                   class="form-control" 
+                                                   id="dateDebutEmprunt" 
+                                                   th:field="*{dateDebutEmprunt}"
+                                                   th:readonly="${emprunt.id != null}"
+                                                   required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('dateDebutEmprunt')}" th:errors="*{dateDebutEmprunt}">
+                                                La date d'emprunt est requise
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label for="dateFinEmprunt" class="form-label">
+                                                <i class="fas fa-calendar-minus me-1"></i>Date de retour <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="date" 
+                                                   class="form-control" 
+                                                   id="dateFinEmprunt" 
+                                                   th:field="*{dateFinEmprunt}"
+                                                   th:readonly="${emprunt.id != null}"
+                                                   required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('dateFinEmprunt')}" th:errors="*{dateFinEmprunt}">
+                                                La date de retour est requise
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="etatEmprunt" class="form-label">
+                                            <i class="fas fa-toggle-on me-1"></i>État de l'emprunt <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" 
+                                                id="etatEmprunt" 
+                                                th:field="*{etatEmprunt}"
+                                                required>
+                                            <option value="">Sélectionnez un état</option>
+                                            <option th:each="etat : ${T(com.haroldmokam.ma_biblio.entites.EtatEmprunt).values()}" 
+                                                    th:value="${etat}" 
+                                                    th:text="${etat}"
+                                                    th:selected="${etat == emprunt.etatEmprunt}">État</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('etatEmprunt')}" th:errors="*{etatEmprunt}">
+                                            L'état est requis
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="commentaire" class="form-label">
+                                            <i class="fas fa-comment me-1"></i>Commentaire
+                                        </label>
+                                        <textarea class="form-control" 
+                                                  id="commentaire" 
+                                                  th:field="*{commentaire}"
+                                                  rows="3"
+                                                  placeholder="Commentaire optionnel sur l'emprunt"></textarea>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('commentaire')}" th:errors="*{commentaire}">
+                                            Erreur de validation
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Right Column - Information Panel -->
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-info-circle me-2"></i>Informations
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- User Information -->
+                                            <div id="userInfo" class="mb-3" style="display: none;">
+                                                <h6 class="text-primary">Informations Utilisateur</h6>
+                                                <div class="small">
+                                                    <p><strong>Nom:</strong> <span id="userName">-</span></p>
+                                                    <p><strong>Email:</strong> <span id="userEmail">-</span></p>
+                                                    <p><strong>Emprunts actifs:</strong> <span id="userActiveLoans">-</span></p>
+                                                    <p><strong>Emprunts restants:</strong> <span id="userRemainingLoans">-</span></p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Book Information -->
+                                            <div id="bookInfo" class="mb-3" style="display: none;">
+                                                <h6 class="text-success">Informations Livre</h6>
+                                                <div class="small">
+                                                    <p><strong>Titre:</strong> <span id="bookTitle">-</span></p>
+                                                    <p><strong>Auteur:</strong> <span id="bookAuthor">-</span></p>
+                                                    <p><strong>Catégorie:</strong> <span id="bookCategory">-</span></p>
+                                                    <p><strong>Disponibles:</strong> <span id="bookAvailable">-</span></p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Loan Duration Info -->
+                                            <div class="alert alert-info">
+                                                <h6 class="alert-heading">
+                                                    <i class="fas fa-clock me-2"></i>Durée d'emprunt
+                                                </h6>
+                                                <p class="mb-0 small">
+                                                    La durée standard d'un emprunt est de <strong>2 semaines</strong>.
+                                                    Les emprunts peuvent être prolongés si nécessaire.
+                                                </p>
+                                            </div>
+                                            
+                                            <!-- Auto-calculation Info -->
+                                            <div class="alert alert-warning">
+                                                <h6 class="alert-heading">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>Calcul automatique
+                                                </h6>
+                                                <p class="mb-0 small">
+                                                    La date de retour sera automatiquement calculée à partir de la date d'emprunt.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Form Actions -->
+                            <div class="d-flex justify-content-between pt-3 border-top">
+                                <a href="/admin/emprunts" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Annuler
+                                </a>
+                                <div>
+                                    <button type="reset" class="btn btn-outline-warning me-2">
+                                        <i class="fas fa-undo me-2"></i>Réinitialiser
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>
+                                        <span th:text="${emprunt.id != null ? 'Mettre à jour' : 'Créer l\'emprunt'}">Créer l'emprunt</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/app.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
+    
+    <script>
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+        
+        // Auto-calculate return date
+        document.getElementById('dateDebutEmprunt').addEventListener('change', function() {
+            const startDate = new Date(this.value);
+            if (startDate && !isNaN(startDate.getTime())) {
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + 14); // Add 14 days
+                
+                const endDateString = endDate.toISOString().split('T')[0];
+                document.getElementById('dateFinEmprunt').value = endDateString;
+            }
+        });
+        
+        // Show user information when selected
+        document.getElementById('utilisateur').addEventListener('change', function() {
+            const userId = this.value;
+            if (userId) {
+                // In a real application, you would fetch user data via AJAX
+                // For now, we'll show a placeholder
+                document.getElementById('userInfo').style.display = 'block';
+                document.getElementById('userName').textContent = this.options[this.selectedIndex].text.split(' (')[0];
+                document.getElementById('userEmail').textContent = 'email@exemple.com';
+                document.getElementById('userActiveLoans').textContent = '0';
+                document.getElementById('userRemainingLoans').textContent = '5';
+            } else {
+                document.getElementById('userInfo').style.display = 'none';
+            }
+        });
+        
+        // Show book information when selected
+        document.getElementById('livre').addEventListener('change', function() {
+            const bookId = this.value;
+            if (bookId) {
+                // In a real application, you would fetch book data via AJAX
+                // For now, we'll show a placeholder
+                document.getElementById('bookInfo').style.display = 'block';
+                const bookText = this.options[this.selectedIndex].text;
+                const parts = bookText.split(' par ');
+                document.getElementById('bookTitle').textContent = parts[0];
+                document.getElementById('bookAuthor').textContent = parts[1] ? parts[1].split(' (')[0] : '-';
+                document.getElementById('bookCategory').textContent = 'Fiscal';
+                const availableMatch = bookText.match(/\((\d+) dispo\)/);
+                document.getElementById('bookAvailable').textContent = availableMatch ? availableMatch[1] : '0';
+            } else {
+                document.getElementById('bookInfo').style.display = 'none';
+            }
+        });
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

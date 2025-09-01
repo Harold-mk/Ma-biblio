@@ -1,6 +1,8 @@
 package com.haroldmokam.ma_biblio.Repositories;
 
 import com.haroldmokam.ma_biblio.entites.Categorie;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,5 +16,8 @@ public interface CategorieRepository extends JpaRepository<Categorie, Integer> {
     List<Categorie> findByLibelleContainingIgnoreCase(String libelle);
 
     List<Categorie> findAll();
+    
+    // Méthodes pour la pagination
+    Page<Categorie> findByLibelleContainingIgnoreCase(String libelle, Pageable pageable);
 
 }

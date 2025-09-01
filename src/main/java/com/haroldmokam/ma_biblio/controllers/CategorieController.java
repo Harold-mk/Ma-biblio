@@ -18,30 +18,36 @@ public class CategorieController {
 
     @PostMapping(path = "/ajouter", produces = MediaType.APPLICATION_JSON_VALUE)
     public void ajouterCategorie(@RequestBody Categorie categorie) {
-        log.info(categorie.getLibelle()+ " a bien ete cree et enregistre dans la base de donnees");
+        log.info(categorie.getLibelle()+ " a bien été créé et enregistré dans la base de données");
         categorieService.creerCategorie(categorie);
     }
 
     @PutMapping(path = "/modifier/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public void modifierCategorie(@PathVariable int id, @RequestBody Categorie categorie) {
-         Categorie categorieDansBD = categorieService.rechercherCategorieParId(id);
-         String ancienLibelle = categorieDansBD.getLibelle();
-         categorieDansBD.setLibelle(categorie.getLibelle());
-        categorieService.creerCategorie(categorieDansBD);
-        log.info("La categorie est quitte de "+ancienLibelle+" a %s"+ categorieDansBD.getLibelle());
+        categorieService.modifierCategorie(id, categorie);
+        log.info("La catégorie avec l'ID " + id + " a été modifiée");
     }
 
     @DeleteMapping(path = "/supprimer/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public void supprimerCategorie(@PathVariable int id) {
-        Categorie categorieDansBD = categorieService.rechercherCategorieParId(id);
-        categorieService.supprimerCategorie(categorieDansBD);
-        log.info("La categorie "+categorieDansBD.getLibelle()+" a ete supprimee de la base de donnees");
+        categorieService.supprimerCategorie(id);
+        log.info("La catégorie avec l'ID " + id + " a été supprimée de la base de données");
     }
 
     @GetMapping(path = "/liste")
     public List<Categorie> listerCategorie() {
-        log.info("Liste des categories");
+        log.info("Liste des catégories");
         return categorieService.rechercherAllCategories();
+    }
+    
+    @GetMapping(path = "/{id}")
+    public Categorie getCategorieById(@PathVariable int id) {
+        return categorieService.getCategorieById(id);
+    }
+    
+    @GetMapping(path = "/recherche/{libelle}")
+    public List<Categorie> rechercherParLibelle(@PathVariable String libelle) {
+        return categorieService.rechercherCategorie(libelle);
     }
 
 }

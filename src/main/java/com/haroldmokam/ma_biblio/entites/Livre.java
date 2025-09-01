@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,6 +31,6 @@ public class Livre {
     private Categorie categorie;
 
     @OneToMany(mappedBy = "livre")
-    private List<Emprunt> emprunts;
+    private List<Emprunt> emprunts = new ArrayList<>();
 
 }

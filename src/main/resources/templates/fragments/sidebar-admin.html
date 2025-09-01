@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <nav th:fragment="sidebar-admin" id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+        <div class="position-sticky pt-3">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${#httpServletRequest.requestURI == '/admin/dashboard'} ? 'active'" href="/admin/dashboard">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Tableau de bord
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/livres')} ? 'active'" href="/admin/livres">
+                        <i class="fas fa-book me-2"></i>
+                        Gestion des Livres
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/emprunts')} ? 'active'" href="/admin/emprunts">
+                        <i class="fas fa-exchange-alt me-2"></i>
+                        Gestion des Emprunts
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/utilisateurs')} ? 'active'" href="/admin/utilisateurs">
+                        <i class="fas fa-users me-2"></i>
+                        Gestion des Utilisateurs
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/categories')} ? 'active'" href="/admin/categories">
+                        <i class="fas fa-tags me-2"></i>
+                        Gestion des Catégories
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/notifications')} ? 'active'" href="/admin/notifications">
+                        <i class="fas fa-bell me-2"></i>
+                        Notifications
+                    </a>
+                </li>
+            </ul>
+            
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+                <span>Rapports</span>
+            </h6>
+            <ul class="nav flex-column mb-2">
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/rapports/emprunts">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Statistiques Emprunts
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/rapports/retards">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Emprunts en Retard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/rapports/popularite">
+                        <i class="fas fa-star me-2"></i>
+                        Livres Populaires
+                    </a>
+                </li>
+            </ul>
+            
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+                <span>Configuration</span>
+            </h6>
+            <ul class="nav flex-column mb-2">
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/config/systeme">
+                        <i class="fas fa-cogs me-2"></i>
+                        Paramètres Système
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/config/backup">
+                        <i class="fas fa-database me-2"></i>
+                        Sauvegarde
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</body>
+</html>

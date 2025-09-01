@@ -25,19 +25,19 @@ public class LivreController {
     @PostMapping( path = "/ajouter", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void ajouterLivre(@RequestBody Livre livre) {
         livreService.creerLivre(livre);
-        log.info("Livre "+livre.getTitre()+"ajout<UNK> avec succes!");
+        log.info("Livre "+livre.getTitre()+" ajouté avec succès!");
     }
 
     @PutMapping( path = "/modifier/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void modifierLivre(@RequestBody Livre livre, @PathVariable int id) {
-        livreService.modifierLivre(livre);
+        livreService.modifierLivre(id, livre);
         log.info("Modifier livre avec id " + id);
     }
 
     @DeleteMapping(path = "/supprimer/{id}")
     public void supprimerLivre(@PathVariable int id) {
-        Livre livre = livreRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Livre n'existe pas"));
-        livreService.supprimerLivre(livre);
+        livreService.supprimerLivre(id);
+        log.info("Livre supprimé avec id " + id);
     }
 
     /**
@@ -49,18 +49,18 @@ public class LivreController {
     }
 
     @GetMapping(path = "/Auteur/{auteur}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Livre> Auteur(@PathVariable String auteur) {
+    public List<Livre> rechercherParAuteur(@PathVariable String auteur) {
         return livreService.afficherListeLivreParAuteur(auteur);
     }
 
     @GetMapping(path = "/Titre/{titre}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Livre> Titre(@PathVariable String titre) {
-            return livreService.afficherListeLivresParTitre(titre);
+    public List<Livre> rechercherParTitre(@PathVariable String titre) {
+        return livreService.afficherListeLivresParTitre(titre);
     }
 
-    @GetMapping(path = "categorie/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public List<Livre> Categorie(@PathVariable int id) {
-        Categorie categorie = categorieService.rechercherCategorieParId(id);
+    @GetMapping(path = "/Categorie/{categorieId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Livre> rechercherParCategorie(@PathVariable int categorieId) {
+        Categorie categorie = categorieService.getCategorieById(categorieId);
         return livreService.afficherListeLivreParCategorie(categorie);
     }
 }

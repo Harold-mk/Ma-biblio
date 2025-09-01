@@ -9,11 +9,16 @@ import com.haroldmokam.ma_biblio.entites.Livre;
 import com.haroldmokam.ma_biblio.entites.Utilisateur;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -37,38 +42,84 @@ public class EmpruntService {
         emprunt.setDateDebutEmprunt(localDate);
         emprunt.setEtatEmprunt( EtatEmprunt.EN_COURS);
         emprunt.setDateFinEmprunt(localDate.plusWeeks(2)); // Ajoute deux semaines à la date locale pour la date de remises du document
-        // Inserer la methode de notification a l'utilisateur pour les utilisateurs
-        notificationService.notificationEmprunt(emprunt);
-        // Methode pour inserer le nombre d'emprunts restants...
-        Utilisateur utilisateur1 = emprunt.getUtilisateur() ;
-        Livre livre1 = emprunt.getLivre() ;
-        utilisateurRepository.save(utilisateur1);
-        if(utilisateur.getNombreEmpruntActif() >=1 && livre1.getNbreExemplairesRestant()>=1){
-            utilisateur1.setNombreEmpruntActif(utilisateur.getNombreEmpruntActif()-1);
-            livre1.setNbreExemplairesRestant(livre1.getNbreExemplairesRestant()-1);
-            livreRepository.save(livre1);
-            utilisateurRepository.save(utilisateur1);
+        
+        // Vérifier les conditions avant de créer l'emprunt
+        if(utilisateur.getNombreEmpruntActif() >= 1 && livre.getNbreExemplairesRestant() >= 1){
+            // Mettre à jour les compteurs
+            utilisateur.setNombreEmpruntActif(utilisateur.getNombreEmpruntActif() - 1);
+            livre.setNbreExemplairesRestant(livre.getNbreExemplairesRestant() - 1);
+            
+            // Sauvegarder les entités
+            livreRepository.save(livre);
+            utilisateurRepository.save(utilisateur);
             empruntRepository.save(emprunt);
+            
+            // Créer la notification
+            notificationService.notificationEmprunt(emprunt);
+        } else {
+            throw new RuntimeException("Opération impossible : Soit l'utilisateur ne dispose plus d'emprunt, soit il n'existe plus d'exemplaire");
         }
-        else {
-            throw new RuntimeException("Operation impossible : Soit l'utilisateur ne dispose plus d'emprunt, soit il n'existe plus d'exemplaire");
+    }
+    
+    // Créer un emprunt avec l'objet Emprunt complet
+    public void creerEmprunt(Emprunt emprunt) {
+        LocalDate localDate = LocalDate.now();
+        emprunt.setDateDebutEmprunt(localDate);
+        emprunt.setEtatEmprunt(EtatEmprunt.EN_COURS);
+        emprunt.setDateFinEmprunt(localDate.plusWeeks(2));
+        
+        Utilisateur utilisateur = emprunt.getUtilisateur();
+        Livre livre = emprunt.getLivre();
+        
+        if(utilisateur.getNombreEmpruntActif() >= 1 && livre.getNbreExemplairesRestant() >= 1){
+            utilisateur.setNombreEmpruntActif(utilisateur.getNombreEmpruntActif() - 1);
+            livre.setNbreExemplairesRestant(livre.getNbreExemplairesRestant() - 1);
+            
+            livreRepository.save(livre);
+            utilisateurRepository.save(utilisateur);
+            empruntRepository.save(emprunt);
+            
+            notificationService.notificationEmprunt(emprunt);
+        } else {
+            throw new RuntimeException("Opération impossible : Soit l'utilisateur ne dispose plus d'emprunt, soit il n'existe plus d'exemplaire");
         }
-
     }
 
     // Changement de l'etat d'un emprunt : Du genre si un le livre a ete remis alors on change l'etat emprunt.
     public void remiseEmprunt(Emprunt emprunt) {
-
-        Utilisateur utilisateur1 = emprunt.getUtilisateur() ;
-        Livre livre1 = emprunt.getLivre() ;
-        utilisateur1.setNombreEmpruntRestant(utilisateur1.getNombreEmpruntRestant()+1);
-        livre1.setNbreExemplairesRestant(livre1.getNbreExemplairesRestant()+1);
+        Utilisateur utilisateur = emprunt.getUtilisateur();
+        Livre livre = emprunt.getLivre();
+        
+        // Mettre à jour les compteurs
+        utilisateur.setNombreEmpruntRestant(utilisateur.getNombreEmpruntRestant() + 1);
+        livre.setNbreExemplairesRestant(livre.getNbreExemplairesRestant() + 1);
+        
+        // Mettre à jour l'emprunt
         emprunt.setEstRemis(true);
-        emprunt.setEtatEmprunt( EtatEmprunt.REMIS);
-        utilisateurRepository.save(utilisateur1);
-        livreRepository.save(livre1);
+        emprunt.setEtatEmprunt(EtatEmprunt.REMIS);
+        
+        // Sauvegarder les entités
+        utilisateurRepository.save(utilisateur);
+        livreRepository.save(livre);
         empruntRepository.save(emprunt);
-        notificationService.notificationRemiseLivre(emprunt, utilisateur1);
+        
+        // Créer la notification
+        notificationService.notificationRemiseLivre(emprunt, utilisateur);
+    }
+    
+    // Retourner un livre (alias pour remiseEmprunt)
+    public void retournerLivre(int id) {
+        Emprunt emprunt = getEmpruntById(id);
+        remiseEmprunt(emprunt);
+    }
+    
+    // Prolonger un emprunt
+    public void prolongerEmprunt(int id) {
+        Emprunt emprunt = getEmpruntById(id);
+        emprunt.setDateFinEmprunt(emprunt.getDateFinEmprunt().plusWeeks(2));
+        emprunt.setEtatEmprunt(EtatEmprunt.EN_COURS);
+        empruntRepository.save(emprunt);
+        notificationService.notificationProlongationEmprunt(emprunt, emprunt.getDateFinEmprunt());
     }
 
     // Changement de l'etat d'emprunt du pour effectuer lorsque le delai est expire
@@ -92,6 +143,61 @@ public class EmpruntService {
         // Inserer ici la methode de notification a l'utilisateur...
         notificationService.notificationProlongationEmprunt(emprunt,emprunt.getDateFinEmprunt());
     }
+    
+    // Modifier un emprunt
+    public void modifierEmprunt(int id, Emprunt emprunt) {
+        Emprunt empruntExistant = getEmpruntById(id);
+        emprunt.setId(id);
+        empruntRepository.save(emprunt);
+    }
+    
+    // Supprimer un emprunt
+    public void supprimerEmprunt(int id) {
+        empruntRepository.deleteById(id);
+    }
+    
+    // Obtenir un emprunt par ID
+    public Emprunt getEmpruntById(int id) {
+        return empruntRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Emprunt non trouvé avec l'ID: " + id));
+    }
+    
+    // Obtenir tous les emprunts avec pagination
+    public Page<Emprunt> getAllEmprunts(Pageable pageable) {
+        return empruntRepository.findAll(pageable);
+    }
+    
+    // Compter les emprunts actifs
+    public long countEmpruntsActifs() {
+        return empruntRepository.countByEtatEmprunt(EtatEmprunt.EN_COURS);
+    }
+    
+    // Compter les emprunts en retard
+    public long countEmpruntsEnRetard() {
+        return empruntRepository.countByEtatEmprunt(EtatEmprunt.DELAI_EXPIRE);
+    }
+    
+    // Obtenir les emprunts en retard avec pagination
+    public Page<Emprunt> getEmpruntsEnRetard(Pageable pageable) {
+        return empruntRepository.findByEtatEmprunt(EtatEmprunt.DELAI_EXPIRE, pageable);
+    }
+    
+    // Rechercher des emprunts avec pagination
+    public Page<Emprunt> rechercherEmprunts(String search, Pageable pageable) {
+        return empruntRepository.findByLivreTitreContainingIgnoreCaseOrUtilisateurNomContainingIgnoreCase(
+                search, search, pageable);
+    }
+    
+    // Rechercher des emprunts par état avec pagination
+    public Page<Emprunt> rechercherEmpruntsParEtat(EtatEmprunt etat, Pageable pageable) {
+        return empruntRepository.findByEtatEmprunt(etat, pageable);
+    }
+    
+    // Rechercher des emprunts par utilisateur avec pagination
+    public Page<Emprunt> rechercherEmpruntsParUtilisateur(String utilisateurNom, Pageable pageable) {
+        return empruntRepository.findByUtilisateurNomContainingIgnoreCase(utilisateurNom, pageable);
+    }
+
     // Ici on va creer une option qui doit gerer faire en sorte que le bibliothecaire valide et puis un message de notification est envoye a l'utilisateur pour lui faire signe
 
     // Historique de validation
@@ -156,4 +262,67 @@ public class EmpruntService {
       - La lite des emprunts en fonction des utilisateurs et des dates. Meme comme je ne vois pas trop la necessite ici mais bon...
       - Les services pour exporter l'historique des emprunts sous format PDF.
      */
+
+    /**
+     * Obtenir les derniers emprunts pour le dashboard
+     */
+    public List<Emprunt> getDerniersEmprunts(int limit) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by("dateDebutEmprunt").descending());
+        return empruntRepository.findAll(pageable).getContent();
+    }
+
+    /**
+     * Obtenir les emprunts en retard pour le dashboard
+     */
+    public List<Emprunt> getEmpruntsEnRetard(int limit) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by("dateFinEmprunt").ascending());
+        return empruntRepository.findByEtatEmprunt(EtatEmprunt.EN_COURS, pageable)
+                .getContent()
+                .stream()
+                .filter(emprunt -> emprunt.getDateFinEmprunt().isBefore(LocalDate.now()))
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Compter les emprunts en retard pour un utilisateur spécifique
+     */
+    public int countEmpruntsEnRetardByUtilisateur(int utilisateurId) {
+        return (int) empruntRepository.findByUtilisateurId(utilisateurId)
+                .stream()
+                .filter(emprunt -> emprunt.getEtatEmprunt() == EtatEmprunt.EN_COURS && 
+                                  emprunt.getDateFinEmprunt().isBefore(LocalDate.now()))
+                .count();
+    }
+
+    /**
+     * Obtenir les emprunts actifs d'un utilisateur
+     */
+    public List<Emprunt> getEmpruntsActifsByUtilisateur(int utilisateurId) {
+        return empruntRepository.findByUtilisateurId(utilisateurId)
+                .stream()
+                .filter(emprunt -> emprunt.getEtatEmprunt() == EtatEmprunt.EN_COURS)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Obtenir les emprunts d'un utilisateur avec pagination
+     */
+    public Page<Emprunt> getEmpruntsByUtilisateur(int utilisateurId, Pageable pageable) {
+        List<Emprunt> emprunts = empruntRepository.findByUtilisateurId(utilisateurId);
+        
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), emprunts.size());
+        
+        return new org.springframework.data.domain.PageImpl<>(
+            emprunts.subList(start, end), pageable, emprunts.size()
+        );
+    }
+
+    /**
+     * Compter le total des emprunts d'un utilisateur
+     */
+    public int countTotalEmpruntsByUtilisateur(int utilisateurId) {
+        return empruntRepository.findByUtilisateurId(utilisateurId).size();
+    }
 }

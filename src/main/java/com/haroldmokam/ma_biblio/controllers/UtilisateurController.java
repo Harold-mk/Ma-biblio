@@ -25,8 +25,8 @@ public class UtilisateurController {
     }
 
     @PutMapping(path = "/modifier/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> modifierUtilisateur(@RequestBody Utilisateur utilisateur) {
-        utilisateurService.modifierUtilisateur(utilisateur);
+    public ResponseEntity<String> modifierUtilisateur(@RequestBody Utilisateur utilisateur, @PathVariable int id) {
+        utilisateurService.modifierUtilisateur(id, utilisateur);
         return new ResponseEntity<>(utilisateur.toString(), HttpStatus.ACCEPTED);
     }
 
@@ -41,24 +41,28 @@ public class UtilisateurController {
        List<Utilisateur> utilisateurs= utilisateurService.listeTotaleUtilisateurs();
         return new ResponseEntity<>(utilisateurs, HttpStatus.OK);
     }
+    
     @GetMapping(path = "/recherche/noms", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Utilisateur>> rechercheUtilisateurParNom(@RequestParam String nom) {
-        List<Utilisateur> utilisateurs= utilisateurService.findUtilisateurByNom(nom);
+    public ResponseEntity<List<Utilisateur>> rechercherParNom(@RequestParam String nom) {
+        List<Utilisateur> utilisateurs = utilisateurService.findUtilisateurByNom(nom);
         return new ResponseEntity<>(utilisateurs, HttpStatus.OK);
     }
-    @GetMapping(path = "/rechercher/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Utilisateur> getUtilisateur(@PathVariable int id) {
-        Utilisateur utilisateur= utilisateurService.findUtilisateurById(id);
+    
+    @GetMapping(path = "/recherche/email", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Utilisateur> rechercherParEmail(@RequestParam String email) {
+        Utilisateur utilisateur = utilisateurService.findUtilisateurByEmail(email);
         return new ResponseEntity<>(utilisateur, HttpStatus.OK);
     }
-    @GetMapping(path = "/rechercher/matricule", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Utilisateur> getUtilisateurByMatricule(@RequestParam String matricule) {
+    
+    @GetMapping(path = "/recherche/matricule", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Utilisateur> rechercherParMatricule(@RequestParam String matricule) {
         Utilisateur utilisateur = utilisateurService.findUtilisateurByMatricule(matricule);
         return new ResponseEntity<>(utilisateur, HttpStatus.OK);
     }
-    @GetMapping(path = "/rechercher/mail", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Utilisateur> getUtilisateurByMail(@RequestParam String mail) {
-        Utilisateur utilisateur = utilisateurService.findUtilisateurByEmail(mail);
+    
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Utilisateur> getUtilisateurById(@PathVariable int id) {
+        Utilisateur utilisateur = utilisateurService.getUtilisateurById(id);
         return new ResponseEntity<>(utilisateur, HttpStatus.OK);
     }
 }

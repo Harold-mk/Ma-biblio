@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Emprunts - Biblio-Tech</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div th:replace="~{fragments/sidebar-admin :: sidebar-admin}"></div>
+            
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Gestion des Emprunts</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <a href="/admin/emprunts/create" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>Nouvel Emprunt
+                            </a>
+                        </div>
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fas fa-download me-1"></i>Exporter
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-file-excel me-2"></i>Excel</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2"></i>PDF</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-file-csv me-2"></i>CSV</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Flash Messages -->
+                <div th:replace="~{fragments/alerts :: alerts}"></div>
+                
+                <!-- Search and Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form th:action="@{/admin/emprunts/search}" method="get" class="row g-3">
+                            <div class="col-md-3">
+                                <label for="searchLivre" class="form-label">Recherche par livre</label>
+                                <input type="text" class="form-control" id="searchLivre" name="livre" placeholder="Titre du livre...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="searchUtilisateur" class="form-label">Recherche par utilisateur</label>
+                                <input type="text" class="form-control" id="searchUtilisateur" name="utilisateur" placeholder="Nom de l'utilisateur...">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="searchEtat" class="form-label">État</label>
+                                <select class="form-select" id="searchEtat" name="etat">
+                                    <option value="">Tous les états</option>
+                                    <option th:each="etat : ${T(com.haroldmokam.ma_biblio.entites.EtatEmprunt).values()}" th:value="${etat}" th:text="${etat}">État</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="searchDateDebut" class="form-label">Date début</label>
+                                <input type="date" class="form-control" id="searchDateDebut" name="dateDebut">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-1"></i>Rechercher
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Loans Table -->
+                <div class="card shadow">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Liste des Emprunts</h6>
+                        <span class="badge bg-primary" th:text="${#lists.size(emprunts)} + ' emprunt(s)'">0 emprunt(s)</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Livre</th>
+                                        <th scope="col">Utilisateur</th>
+                                        <th scope="col">Date d'emprunt</th>
+                                        <th scope="col">Date de retour</th>
+                                        <th scope="col">État</th>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="emprunt : ${emprunts}" th:key="${emprunt.id}">
+                                        <td th:text="${emprunt.id}">1</td>
+                                        <td>
+                                            <strong th:text="${emprunt.livre.titre}">Titre du livre</strong>
+                                            <br>
+                                            <small class="text-muted" th:text="${emprunt.livre.auteur}">Auteur</small>
+                                        </td>
+                                        <td>
+                                            <strong th:text="${emprunt.utilisateur.nom + ' ' + emprunt.utilisateur.prenom}">Nom utilisateur</strong>
+                                            <br>
+                                            <small class="text-muted" th:text="${emprunt.utilisateur.mail}">Email</small>
+                                        </td>
+                                        <td th:text="${#temporals.format(emprunt.dateDebutEmprunt, 'dd/MM/yyyy')}">01/01/2024</td>
+                                        <td>
+                                            <span th:text="${#temporals.format(emprunt.dateFinEmprunt, 'dd/MM/yyyy')}" 
+                                                  th:class="${emprunt.dateFinEmprunt.isBefore(T(java.time.LocalDate).now()) ? 'text-danger fw-bold' : ''}">01/01/2024</span>
+                                        </td>
+                                        <td>
+                                            <span th:class="${emprunt.etatEmprunt == T(com.haroldmokam.ma_biblio.entites.EtatEmprunt).EN_COURS ? 'badge bg-success' : 
+                                                           emprunt.etatEmprunt == T(com.haroldmokam.ma_biblio.entites.EtatEmprunt).DELAI_EXPIRE ? 'badge bg-danger' : 
+                                                           'badge bg-secondary'}" 
+                                                  th:text="${emprunt.etatEmprunt}">État</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a th:href="@{/admin/emprunts/{id}(id=${emprunt.id})}" 
+                                                   class="btn btn-sm btn-outline-primary" title="Voir">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a th:href="@{/admin/emprunts/{id}/edit(id=${emprunt.id})}" 
+                                                   class="btn btn-sm btn-outline-warning" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-success" 
+                                                        title="Retourner le livre" 
+                                                        th:if="${emprunt.etatEmprunt == T(com.haroldmokam.ma_biblio.entites.EtatEmprunt).EN_COURS || emprunt.etatEmprunt == T(com.haroldmokam.ma_biblio.entites.EtatEmprunt).DELAI_EXPIRE}"
+                                                        th:onclick="'retournerLivre(' + ${emprunt.id} + ')'">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-info" 
+                                                        title="Prolonger l'emprunt" 
+                                                        th:if="${emprunt.etatEmprunt == T(com.haroldmokam.ma_biblio.entites.EtatEmprunt).EN_COURS || emprunt.etatEmprunt == T(com.haroldmokam.ma_biblio.entites.EtatEmprunt).DELAI_EXPIRE}"
+                                                        th:onclick="'prolongerEmprunt(' + ${emprunt.id} + ')'">
+                                                    <i class="fas fa-clock"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        title="Supprimer" 
+                                                        th:onclick="'confirmDelete(' + ${emprunt.id} + ')'">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(emprunts)}">
+                                        <td colspan="7" class="text-center py-4">
+                                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                            <h5 class="text-muted">Aucun emprunt trouvé</h5>
+                                            <p class="text-muted">Commencez par créer votre premier emprunt</p>
+                                            <a href="/admin/emprunts/create" class="btn btn-primary">
+                                                <i class="fas fa-plus me-2"></i>Créer un emprunt
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <nav th:if="${#lists.size(emprunts) > 0}" aria-label="Navigation des emprunts" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Précédent</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Suivant</a>
+                        </li>
+                    </ul>
+                </nav>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Êtes-vous sûr de vouloir supprimer cet emprunt ? Cette action est irréversible.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <form id="deleteForm" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Return Book Modal -->
+    <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="returnModalLabel">Confirmer le retour</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Êtes-vous sûr de vouloir retourner ce livre ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <form id="returnForm" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-success">Retourner</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Extend Loan Modal -->
+    <div class="modal fade" id="extendModal" tabindex="-1" aria-labelledby="extendModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="extendModalLabel">Confirmer la prolongation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Êtes-vous sûr de vouloir prolonger cet emprunt de 2 semaines ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <form id="extendForm" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-info">Prolonger</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/app.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
+    
+    <script>
+        function confirmDelete(empruntId) {
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            const form = document.getElementById('deleteForm');
+            form.action = `/admin/emprunts/${empruntId}/delete`;
+            modal.show();
+        }
+        
+        function retournerLivre(empruntId) {
+            const modal = new bootstrap.Modal(document.getElementById('returnModal'));
+            const form = document.getElementById('returnForm');
+            form.action = `/admin/emprunts/${empruntId}/retourner`;
+            modal.show();
+        }
+        
+        function prolongerEmprunt(empruntId) {
+            const modal = new bootstrap.Modal(document.getElementById('extendModal'));
+            const form = document.getElementById('extendForm');
+            form.action = `/admin/emprunts/${empruntId}/prolonger`;
+            modal.show();
+        }
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

@@ -3,6 +3,8 @@ package com.haroldmokam.ma_biblio.services;
 import com.haroldmokam.ma_biblio.Repositories.CategorieRepository;
 import com.haroldmokam.ma_biblio.entites.Categorie;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,7 +32,13 @@ public class CategorieService {
         }
 
     }
-
+    
+    // Modifier une catégorie
+    public void modifierCategorie(int id, Categorie categorie) {
+        Categorie categorieExistant = getCategorieById(id);
+        categorie.setId(id);
+        categorieRepository.save(categorie);
+    }
 
     /**
      * @Author Harold Roger
@@ -44,6 +52,33 @@ public class CategorieService {
         else{
             throw new RuntimeException("L'element n'existe pas dans la base de donnees ou elle a deja ete supprimmee.");
         }
+    }
+    
+    // Supprimer une catégorie par ID
+    public void supprimerCategorie(int id) {
+        Categorie categorie = getCategorieById(id);
+        categorieRepository.deleteById(id);
+    }
+    
+    // Obtenir une catégorie par ID
+    public Categorie getCategorieById(int id) {
+        return categorieRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Catégorie non trouvée avec l'ID: " + id));
+    }
+    
+    // Obtenir toutes les catégories avec pagination
+    public Page<Categorie> getAllCategories(Pageable pageable) {
+        return categorieRepository.findAll(pageable);
+    }
+    
+    // Obtenir toutes les catégories sans pagination
+    public List<Categorie> getAllCategories() {
+        return categorieRepository.findAll();
+    }
+    
+    // Rechercher des catégories avec pagination
+    public Page<Categorie> rechercherCategories(String search, Pageable pageable) {
+        return categorieRepository.findByLibelleContainingIgnoreCase(search, pageable);
     }
 
     public List<Categorie> rechercherCategorie( String libelle) {

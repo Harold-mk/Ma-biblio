@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${notification.title + ' - Biblio-Tech'}">Notification - Biblio-Tech</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div th:replace="~{fragments/sidebar-admin :: sidebar-admin}"></div>
+            
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" th:text="${notification.title}">Notification</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <a href="/admin/notifications" class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                        </a>
+                        <a th:href="@{/admin/notifications/{id}/edit(id=${notification.id})}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit me-1"></i>Modifier
+                        </a>
+                        <form th:action="@{/admin/notifications/{id}/delete(id=${notification.id})}" method="post" class="d-inline" 
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette notification ?')">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Flash Messages -->
+                <div th:replace="~{fragments/alerts :: alerts}"></div>
+                
+                <!-- Notification Details -->
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-bell me-2"></i>Détails de la Notification
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <strong>Titre :</strong>
+                                    </div>
+                                    <div class="col-sm-9" th:text="${notification.title}">
+                                        Titre de la notification
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <strong>Message :</strong>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <p class="mb-0" th:text="${notification.message}">
+                                            Message de la notification
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <strong>Statut :</strong>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <span class="badge" 
+                                              th:classappend="${notification.statut == T(com.haroldmokam.ma_biblio.entites.Statut).INFO ? 'bg-info' : 
+                                                              notification.statut == T(com.haroldmokam.ma_biblio.entites.Statut).WARNING ? 'bg-warning' : 
+                                                              notification.statut == T(com.haroldmokam.ma_biblio.entites.Statut).ERROR ? 'bg-danger' : 'bg-success'}"
+                                              th:text="${notification.statut.name()}">
+                                            Statut
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <strong>État :</strong>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <span class="badge" 
+                                              th:classappend="${notification.lu ? 'bg-success' : 'bg-warning'}"
+                                              th:text="${notification.lu ? 'Lue' : 'Non lue'}">
+                                            État
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <strong>Date de création :</strong>
+                                    </div>
+                                    <div class="col-sm-9" th:text="${#temporals.format(notification.dateCreation, 'dd/MM/yyyy HH:mm')}">
+                                        01/01/2024 10:00
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-user me-2"></i>Destinataire
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${notification.utilisateurDestinataire != null}">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-user-circle fa-2x text-primary"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0" th:text="${notification.utilisateurDestinataire.nom + ' ' + notification.utilisateurDestinataire.prenom}">
+                                                Nom Prénom
+                                            </h6>
+                                            <small class="text-muted" th:text="${notification.utilisateurDestinataire.mail}">
+                                                email@example.com
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <small class="text-muted">Matricule :</small>
+                                        <div th:text="${notification.utilisateurDestinataire.matricule}">MAT001</div>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <small class="text-muted">Rôle :</small>
+                                        <div>
+                                            <span class="badge" 
+                                                  th:classappend="${notification.utilisateurDestinataire.role == T(com.haroldmokam.ma_biblio.entites.RoleUtilisateur).BIBLIOTHÉCAIRE ? 'bg-primary' : 'bg-info'}"
+                                                  th:text="${notification.utilisateurDestinataire.role.name()}">
+                                                Rôle
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div th:if="${notification.utilisateurDestinataire == null}" class="text-center text-muted">
+                                    <i class="fas fa-users fa-2x mb-2"></i>
+                                    <p class="mb-0">Notification envoyée à tous les utilisateurs</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card shadow">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-chart-bar me-2"></i>Statistiques
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="h4 mb-0 text-primary" th:text="${notification.lu ? '1' : '0'}">0</div>
+                                        <small class="text-muted">Lue</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="h4 mb-0 text-warning" th:text="${notification.lu ? '0' : '1'}">1</div>
+                                        <small class="text-muted">Non lue</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/app.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${utilisateur.id != null ? 'Modifier l\'Utilisateur - Biblio-Tech' : 'Nouvel Utilisateur - Biblio-Tech'}">Utilisateur - Biblio-Tech</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div th:replace="~{fragments/sidebar-admin :: sidebar-admin}"></div>
+            
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" th:text="${utilisateur.id != null ? 'Modifier l\'Utilisateur' : 'Nouvel Utilisateur'}">Utilisateur</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <a href="/admin/utilisateurs" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Flash Messages -->
+                <div th:replace="~{fragments/alerts :: alerts}"></div>
+                
+                <!-- User Form -->
+                <div class="card shadow">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-user me-2"></i>
+                            <span th:text="${utilisateur.id != null ? 'Modifier les informations de l\'utilisateur' : 'Remplissez les informations du nouvel utilisateur'}">Informations de l'utilisateur</span>
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/admin/utilisateurs}" th:object="${utilisateur}" method="post" class="needs-validation" novalidate>
+                            <input type="hidden" th:field="*{id}">
+                            
+                            <div class="row">
+                                <!-- Personal Information -->
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-user-circle me-2"></i>Informations Personnelles
+                                    </h5>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="nom" class="form-label">
+                                                <i class="fas fa-user me-1"></i>Nom <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="nom" 
+                                                   th:field="*{nom}"
+                                                   placeholder="Entrez le nom"
+                                                   required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}">
+                                                Le nom est requis
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label for="prenom" class="form-label">
+                                                <i class="fas fa-user me-1"></i>Prénom <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="prenom" 
+                                                   th:field="*{prenom}"
+                                                   placeholder="Entrez le prénom"
+                                                   required>
+                                            <div class="invalid-feedback" th:if="${#fields.hasErrors('prenom')}" th:errors="*{prenom}">
+                                                Le prénom est requis
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="mail" class="form-label">
+                                            <i class="fas fa-envelope me-1"></i>Email <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="email" 
+                                               class="form-control" 
+                                               id="mail" 
+                                               th:field="*{mail}"
+                                               placeholder="entrez@exemple.com"
+                                               required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('mail')}" th:errors="*{mail}">
+                                            Email invalide
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="matricule" class="form-label">
+                                            <i class="fas fa-id-card me-1"></i>Matricule <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="matricule" 
+                                               th:field="*{matricule}"
+                                               placeholder="MAT001"
+                                               required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('matricule')}" th:errors="*{matricule}">
+                                            Le matricule est requis
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Account Information -->
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">
+                                        <i class="fas fa-shield-alt me-2"></i>Informations du Compte
+                                    </h5>
+                                    
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">
+                                            <i class="fas fa-lock me-1"></i>Mot de passe <span class="text-danger" th:if="${utilisateur.id == null}">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <input type="password" 
+                                                   class="form-control" 
+                                                   id="password" 
+                                                   th:field="*{password}"
+                                                   th:required="${utilisateur.id == null}"
+                                                   placeholder="Entrez le mot de passe">
+                                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="form-text" th:if="${utilisateur.id != null}">
+                                            Laissez vide pour conserver le mot de passe actuel
+                                        </div>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">
+                                            Le mot de passe est requis
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="role" class="form-label">
+                                            <i class="fas fa-user-tag me-1"></i>Rôle <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" 
+                                                id="role" 
+                                                th:field="*{role}"
+                                                required>
+                                            <option value="">Sélectionnez un rôle</option>
+                                            <option th:each="role : ${roles}" 
+                                                    th:value="${role}" 
+                                                    th:text="${role}"
+                                                    th:selected="${role == utilisateur.role}">Rôle</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">
+                                            Le rôle est requis
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="statut" class="form-label">
+                                            <i class="fas fa-toggle-on me-1"></i>Statut <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" 
+                                                id="statut" 
+                                                th:field="*{statut}"
+                                                required>
+                                            <option value="">Sélectionnez un statut</option>
+                                            <option th:each="statut : ${T(com.haroldmokam.ma_biblio.entites.Statut).values()}" 
+                                                    th:value="${statut}" 
+                                                    th:text="${statut}"
+                                                    th:selected="${statut == utilisateur.statut}">Statut</option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('statut')}" th:errors="*{statut}">
+                                            Le statut est requis
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="nombreEmpruntActif" class="form-label">
+                                                <i class="fas fa-book me-1"></i>Emprunts Actifs
+                                            </label>
+                                            <input type="number" 
+                                                   class="form-control" 
+                                                   id="nombreEmpruntActif" 
+                                                   th:field="*{nombreEmpruntActif}"
+                                                   min="0"
+                                                   max="5"
+                                                   readonly>
+                                            <div class="form-text">Géré automatiquement</div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label for="nombreEmpruntRestant" class="form-label">
+                                                <i class="fas fa-check-circle me-1"></i>Emprunts Restants
+                                            </label>
+                                            <input type="number" 
+                                                   class="form-control" 
+                                                   id="nombreEmpruntRestant" 
+                                                   th:field="*{nombreEmpruntRestant}"
+                                                   min="0"
+                                                   max="5"
+                                                   readonly>
+                                            <div class="form-text">Géré automatiquement</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Form Actions -->
+                            <div class="d-flex justify-content-between pt-3 border-top">
+                                <a href="/admin/utilisateurs" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Annuler
+                                </a>
+                                <div>
+                                    <button type="reset" class="btn btn-outline-warning me-2">
+                                        <i class="fas fa-undo me-2"></i>Réinitialiser
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>
+                                        <span th:text="${utilisateur.id != null ? 'Mettre à jour' : 'Enregistrer'}">Enregistrer</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/app.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
+    
+    <script>
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+        
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const password = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

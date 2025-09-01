@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${utilisateur.nom + ' ' + utilisateur.prenom + ' - Biblio-Tech'}">Détail de l'Utilisateur - Biblio-Tech</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div th:replace="~{fragments/sidebar-admin :: sidebar-admin}"></div>
+            
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Détail de l'Utilisateur</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <a th:href="@{/admin/utilisateurs/{id}/edit(id=${utilisateur.id})}" class="btn btn-warning">
+                                <i class="fas fa-edit me-1"></i>Modifier
+                            </a>
+                            <a href="/admin/utilisateurs" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Flash Messages -->
+                <div th:replace="~{fragments/alerts :: alerts}"></div>
+                
+                <!-- User Details -->
+                <div class="row">
+                    <!-- Left Column - User Avatar and Basic Info -->
+                    <div class="col-lg-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-user-circle me-2"></i>Profil
+                                </h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="mb-3">
+                                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                         style="width: 120px; height: 120px;">
+                                        <i class="fas fa-user fa-3x"></i>
+                                    </div>
+                                </div>
+                                
+                                <h5 th:text="${utilisateur.nom + ' ' + utilisateur.prenom}">Nom complet</h5>
+                                <p class="text-muted" th:text="${utilisateur.mail}">email@exemple.com</p>
+                                
+                                <!-- Status Badge -->
+                                <div class="mb-3">
+                                    <span th:class="${utilisateur.statut == T(com.haroldmokam.ma_biblio.entites.Statut).ACTIF ? 'badge bg-success fs-6' : 'badge bg-danger fs-6'}" 
+                                          th:text="${utilisateur.statut}">
+                                        Statut
+                                    </span>
+                                </div>
+                                
+                                <!-- Role Badge -->
+                                <div class="mb-3">
+                                    <span th:class="${utilisateur.role == T(com.haroldmokam.ma_biblio.entites.RoleUtilisateur).BIBLIOTHÉCAIRE ? 'badge bg-primary fs-6' : 'badge bg-info fs-6'}" 
+                                          th:text="${utilisateur.role}">
+                                        Rôle
+                                    </span>
+                                </div>
+                                
+                                <!-- Quick Actions -->
+                                <div class="d-grid gap-2">
+                                    <a th:href="@{/admin/emprunts/create?utilisateurId={id}(id=${utilisateur.id})}" 
+                                       class="btn btn-primary" 
+                                       th:if="${utilisateur.nombreEmpruntRestant > 0}">
+                                        <i class="fas fa-exchange-alt me-2"></i>Créer un emprunt
+                                    </a>
+                                    <button class="btn btn-outline-info" disabled th:unless="${utilisateur.nombreEmpruntRestant > 0}">
+                                        <i class="fas fa-times me-2"></i>Quota d'emprunts épuisé
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column - User Information -->
+                    <div class="col-lg-8">
+                        <!-- Personal Information -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-info-circle me-2"></i>Informations Personnelles
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <dl class="row">
+                                            <dt class="col-sm-4">Nom :</dt>
+                                            <dd class="col-sm-8" th:text="${utilisateur.nom}">Nom</dd>
+                                            
+                                            <dt class="col-sm-4">Prénom :</dt>
+                                            <dd class="col-sm-8" th:text="${utilisateur.prenom}">Prénom</dd>
+                                            
+                                            <dt class="col-sm-4">Email :</dt>
+                                            <dd class="col-sm-8" th:text="${utilisateur.mail}">email@exemple.com</dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <dl class="row">
+                                            <dt class="col-sm-4">ID :</dt>
+                                            <dd class="col-sm-8" th:text="${utilisateur.id}">ID</dd>
+                                            
+                                            <dt class="col-sm-4">Matricule :</dt>
+                                            <dd class="col-sm-8" th:text="${utilisateur.matricule}">MAT001</dd>
+                                            
+                                            <dt class="col-sm-4">Rôle :</dt>
+                                            <dd class="col-sm-8">
+                                                <span th:class="${utilisateur.role == T(com.haroldmokam.ma_biblio.entites.RoleUtilisateur).BIBLIOTHÉCAIRE ? 'badge bg-primary' : 'badge bg-info'}" 
+                                                      th:text="${utilisateur.role}">Rôle</span>
+                                            </dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Loan Statistics -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-chart-bar me-2"></i>Statistiques d'Emprunts
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-4">
+                                        <div class="border-end">
+                                            <h4 class="text-primary" th:text="${utilisateur.nombreEmpruntActif}">0</h4>
+                                            <p class="text-muted mb-0">Emprunts Actifs</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="border-end">
+                                            <h4 class="text-success" th:text="${utilisateur.nombreEmpruntRestant}">0</h4>
+                                            <p class="text-muted mb-0">Emprunts Restants</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div>
+                                            <h4 class="text-warning" th:text="${#lists.size(utilisateur.emprunts)}">0</h4>
+                                            <p class="text-muted mb-0">Total Emprunts</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Loans -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-history me-2"></i>Derniers Emprunts
+                        </h6>
+                        <a th:href="@{/admin/emprunts?utilisateurId={id}(id=${utilisateur.id})}" class="btn btn-sm btn-outline-primary">
+                            Voir tous les emprunts
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Livre</th>
+                                        <th>Date d'emprunt</th>
+                                        <th>Date de retour</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="emprunt : ${utilisateur.emprunts}" th:if="${#lists.size(utilisateur.emprunts) > 0}">
+                                        <td th:text="${emprunt.livre.titre}">Titre du livre</td>
+                                        <td th:text="${#temporals.format(emprunt.dateDebutEmprunt, 'dd/MM/yyyy')}">Date début</td>
+                                        <td th:text="${#temporals.format(emprunt.dateFinEmprunt, 'dd/MM/yyyy')}">Date fin</td>
+                                        <td>
+                                            <span th:class="${emprunt.etatEmprunt == T(com.haroldmokam.ma_biblio.entites.EtatEmprunt).EN_COURS ? 'badge bg-success' : 
+                                                           emprunt.etatEmprunt == T(com.haroldmokam.ma_biblio.entites.EtatEmprunt).DELAI_EXPIRE ? 'badge bg-danger' : 
+                                                           'badge bg-secondary'}"
+                                                  th:text="${emprunt.etatEmprunt}">Statut</span>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{/admin/emprunts/{id}(id=${emprunt.id})}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(utilisateur.emprunts)}">
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                                            <p>Aucun emprunt pour cet utilisateur</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Notifications -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-bell me-2"></i>Dernières Notifications
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <div th:each="notification : ${utilisateur.notifications}" th:if="${#lists.size(utilisateur.notifications) > 0}" 
+                                 class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1" th:text="${notification.title}">Titre de la notification</h6>
+                                    <p class="mb-0 text-muted" th:text="${notification.message}">Message de la notification</p>
+                                    <small class="text-muted" th:text="${#temporals.format(notification.dateCreation, 'dd/MM/yyyy HH:mm')}">Date</small>
+                                </div>
+                                <span th:class="${notification.lu ? 'badge bg-secondary' : 'badge bg-primary'}" 
+                                      th:text="${notification.lu ? 'Lu' : 'Non lu'}">Statut</span>
+                            </div>
+                            <div th:if="${#lists.isEmpty(utilisateur.notifications)}" class="text-center text-muted py-3">
+                                <i class="fas fa-bell-slash fa-2x mb-2"></i>
+                                <p>Aucune notification</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/app.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

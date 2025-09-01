@@ -31,8 +31,8 @@ public class EmpruntController {
      */
     @PostMapping(path = "/ajouter", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void ajouterEmprunt(@RequestBody Emprunt emprunt) {
-        empruntService.creerEmprunt(emprunt.getUtilisateur(),emprunt.getLivre());
-        log.info("Emprunt ajout<UNK>");
+        empruntService.creerEmprunt(emprunt);
+        log.info("Emprunt ajouté avec succès");
     }
 
     /**
@@ -41,7 +41,7 @@ public class EmpruntController {
      */
     @PutMapping(path ="/prolonger/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void prolongerEmprunt(@PathVariable int id) {
-        empruntService.prolongementDateEmprunt(id);
+        empruntService.prolongerEmprunt(id);
     }
 
     /**
@@ -50,8 +50,7 @@ public class EmpruntController {
      */
     @PutMapping(path ="/remise/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void remiseEmprunt(@PathVariable int id) {
-        Emprunt emprunt1 =empruntService.getEmprunt(id);
-        empruntService.remiseEmprunt(emprunt1);
+        empruntService.retournerLivre(id);
     }
 
     /**
@@ -60,7 +59,7 @@ public class EmpruntController {
 
     @GetMapping(path = "/rechercher/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Emprunt rechercherEmpruntParId(@PathVariable int id) {
-        return empruntService.getEmprunt(id);
+        return empruntService.getEmpruntById(id);
     }
 
     @GetMapping(path = "/listeTotale", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -77,7 +76,8 @@ public class EmpruntController {
     public List<Emprunt> listeEnCours() {
         return empruntService.listeEmpruntsEnCours();
     }
-    @GetMapping(path = "/Utilsateur/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    
+    @GetMapping(path = "/Utilisateur/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Emprunt> rechercheParUtilisateur(@PathVariable int id) {
         Utilisateur utilisateur = utilisateurRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("l'utilisateur n'existe pas dans la base de donnees."));
@@ -86,17 +86,20 @@ public class EmpruntController {
 
     @GetMapping(path = "/Livre/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Emprunt> rechercheParLivre(@PathVariable int id) {
-        Livre livre = livreRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Livre non trouv<UNK>"));
+        Livre livre = livreRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Livre non trouvé"));
         return empruntService.ListeEmpruntsParLivre(livre);
     }
+    
     @GetMapping(path = "/remis", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Emprunt> listeRemis() {
         return empruntService.listeLivreDejaRemis();
     }
+    
     @GetMapping(path = "/liste/dateDebutEmprunt/{date}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Emprunt> listeDateDebutEmprunt(@PathVariable LocalDate date) {
         return empruntService.ListeEmpruntsParDateDebutEmprunts(date);
     }
+    
     @GetMapping(path = "/liste/dateFinEmprunt/{date}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Emprunt> listeDateFinEmprunt(@PathVariable LocalDate date) {
         return empruntService.ListeEmpruntsParDateFinEmprunts(date);

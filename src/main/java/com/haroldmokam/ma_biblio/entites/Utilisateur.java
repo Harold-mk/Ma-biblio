@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,6 +19,7 @@ public class Utilisateur {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String nom;
+    private String prenom;
     @Column(unique = true)
     private String mail;
     @Column(unique = true)
@@ -25,12 +27,13 @@ public class Utilisateur {
     private String password;
     private Statut statut;
     private RoleUtilisateur role;
-    private int nombreEmpruntActif =5;// Definition du nombre maximal d'emprunt = 5
-    private int nombreEmpruntRestant;
+    private int nombreEmpruntActif = 5;// Definition du nombre maximal d'emprunt = 5
+    private int nombreEmpruntRestant = 5;
 
     @OneToMany(mappedBy = "utilisateurDestinataire", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Notification> notifications;
-    @OneToMany( mappedBy = "utilisateur", cascade = CascadeType.ALL)
-    private List<Emprunt> emprunts;
+    private List<Notification> notifications = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    private List<Emprunt> emprunts = new ArrayList<>();
 
 }
